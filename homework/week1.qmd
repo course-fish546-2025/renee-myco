@@ -5,9 +5,27 @@ format: html
 
 # What is your prior experience in this discipline?
 
+I have worked with a couple of scientists in my previous job (Fungi Perfecti R&D) and helped set up computational infrastructure for sequencing and comparing 100 whole genomes of the rare fungus *Fomitopsis officinalis* to find a "superstrain" for antiviral drug discovery as a long term academic-industry collaboration. We also started RNA sequencing work with mammalian cells. So I have a lot of general awareness of bioinformatics workflows but have not been able to pursue training until now.
+
+Unix command line work is new to me but I'm really enjoying learning about it. I know R coding and inferential statistics.
+
+Let me know if more CS training is essential for this class, or if this suffices!
+
 # What do you hope to get out of this class?
 
+I am pursuing a microbial ecology project, and really hope to get the tools needed to analyze genomic and metagenomic data and answer scientific questions. I aspire to be computationally competent in the biological sciences.
+
 # This class is strongly rooted in an independent project related to genomic analyses. What specific project do you have in mind? If you do not have any data or preference, data can be provided / aquired. If you do not have a specfic project, what approach would you like to master as part of this class?
-I have bacterial and fungal metagenomes from soil/root samples from a greenhouse study. There are 46 metagenomes total and on a 10TB drive in my lab. 
+
+I am working on biodegradable hydrogels with microbial consortia for soil health. I have bacterial and fungal metagenomes from soil/root samples from a greenhouse study. There are 46 metagenomes total, and on a 10TB drive in my lab.
+
+Based on earlier conversation in class, I am thinking of starting with 1 metagenome: assembly, annotation. From there, do a comparison of 2 metagenomes (maybe a control vs treatment). If things really get rolling, I would be happy to tackle the whole set thought this feels very ambitious right now.
 
 # What are two things you found most useful from the reading?
+
+I like the textbook! These are 2 things that stood out:
+
+1.  **Treating all data as read-only** - I appreciate how complex and sometimes delicate these tools and code can be. If all else fails, at least data corruption, erasure etc wouldn't be a factor.
+2.  **Making errors visible and using assert functions** - errors are not always easy to spot and failure points can be opaque. So you can build in assert functions that stop the program if a statement is false.
+
+The Unix command line syntax, shortcuts, etc are also very interesting and useful and will take a while to learn and become habituated. Looking forward to it though.
