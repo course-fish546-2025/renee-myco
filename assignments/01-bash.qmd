@@ -1,0 +1,76 @@
+---
+title: "01-bash"
+format: html
+---
+
+## 
+```{bash}
+whoami
+```
+
+```{bash}
+pwd
+```
+```{bash}
+ls
+```
+
+```{bash}
+ls -F
+```
+
+```{bash}
+cd ..
+cd ~
+ls
+cd data-shell
+```
+```{bash}
+cd ..
+cd data-shell
+ls
+
+```
+```{bash}
+cd ..
+cd data-shell
+ls
+ls -F
+ls -F data
+ls -F /home/jovyan/data-shell/data/
+ls north-pacific-gyre/
+mkdir thesis
+ls -F thesis
+```
+```{bash}
+cd thesis 
+nano draft.txt
+```
+```{bash}
+cd ..
+ls
+cd data-shell
+ls
+```
+```{bash}
+cd ..
+cd data-shell
+ls molecules
+cd molecules
+wc -l *.pdb
+wc -l *.pdb > lengths
+sort -n lengths
+sort -n lengths > sorted-lengths
+head -1 sorted-lengths
+sort -n lengths | head -1
+wc -l *.pdb | sort -n | head -1
+```
+```{bash}
+cd ..
+cd data-shell
+cd north-pacific-gyre/2012-07-03
+wc -l *.txt
+wc -l *.txt | sort -n | head -5
+wc -l *.txt | sort -n | tail -5
+ls *Z.txt
+```
