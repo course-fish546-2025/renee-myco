@@ -16,7 +16,7 @@ tar -xf ncbi-blast-2.16.0+-x64-linux.tar.gz
 /home/jovyan/applications/ncbi-blast-2.16.0+/bin/blastx -h #verify installation
 ```
 
-# Make Blast Database
+# Make BLAST database
 
 We're using Swiss-Prot in UniProtKB.
 
@@ -24,8 +24,16 @@ We're using Swiss-Prot in UniProtKB.
 pwd
 ```
 
+But terminal indicates that it is:
+
+```         
+/home/jovyan/renee-myco/
+```
+
+However, the relative paths that work in the scripts indicate that indeed the assignments folder is the working directory. It's a mystery.
+
 ```{bash}
-cd ../../blastdb #use relative paths!
+cd ../../blastdb
 
 curl -O https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/uniprot_sprot.fasta.gz
 
@@ -41,38 +49,52 @@ head ../../blastdb/unip* #check the file
 ```
 
 ```{bash}
-/home/jovyan/applications/ncbi-blast-2.16.0+/bin/makeblastdb \ 
-
--in ../blastdb/uniprot_sprot_r2025_01.fasta \
+/home/jovyan/applications/ncbi-blast-2.16.0+/bin/makeblastdb \
+-in ../../blastdb/uniprot_sprot_r2025_01.fasta \
 -dbtype prot \
--out ../blastdb/uniprot_sprot_r2025_01
+-out ../../blastdb/uniprot_sprot_r2025_01
+
 ```
 
 # Get the query sequence
 
 ```{bash}
 curl https://eagle.fish.washington.edu/cnidarian/Ab_4denovo_CLC6_a.fa \
--k \ 
-> ../blastdb/Ab_4denovo_CLC6_a.fa # curl command not working?
+-k \
+> ../../blastdb/Ab_4denovo_CLC6_a.fa 
 
-head ../blastdb/Ab_4denovo_CLC6_a.fa
+head ../../blastdb/Ab_4denovo_CLC6_a.fa
 echo "How many sequences are there?"
-grep -c ">" ../blastdb/Ab_4denovo_CLC6_a.fa
+grep -c ">" ../../blastdb/Ab_4denovo_CLC6_a.fa
 ```
 
-# Run Blast
+There were some hiccups here, mainly with hidden characters (extra spaces after slashes) with the curl command. However, I was able to confirm 5490 sequences. I keep having to change the relative file path and hope I didn't miss anything too badly with the initial project setup.
+
+# Run BLAST
 
 ```{bash}
-../applications/ncbi-blast-2.16.0+/bin/blastx \ 
--query ../blastdb/Ab_4denovo_CLC6_a.fa \
--db ../blastdb/uniprot_sprot_r2023_01 \
--out ../output/Ab_4-uniprot_blastx.tab \
+../../applications/ncbi-blast-2.16.0+/bin/blastx \
+-query ../../blastdb/Ab_4denovo_CLC6_a.fa \
+-db ../../blastdb/uniprot_sprot_r2025_01 \
+-out ../../output/Ab_4-uniprot_blastx.tab \
 -evalue 1E-20 \
 -num_threads 20 \
 -max_target_seqs 1 \
 -outfmt 6
 
-head -2 ../output/Ab_4-uniprot_blastx.tab
-wc -l ../output/Ab_4-uniprot_blastx.tab
+head -2 ../../output/Ab_4-uniprot_blastx.tab
+wc -l ../../output/Ab_4-uniprot_blastx.tab
 
 ```
+
+Running BLAST took a long time - about 45 minutes. Here was the output:
+
+```{bash}
+Warning: [Query 5476-5490] Examining 5 or more matches is recommended
+Warning: [Query 5476-5490] Number of threads was reduced to 16 to match the number of available CPUs
+solid0078_20110412_FRAG_BC_WHITE_WHITE_F3_QV_SE_trimmed_contig_3	sp|O42248|GBLP_DANRE	82.456	171	30	0	1	513	35	205	2.83e-103	301
+solid0078_20110412_FRAG_BC_WHITE_WHITE_F3_QV_SE_trimmed_contig_5	sp|Q08013|SSRG_RAT	75.385	65	16	0	3	197	121	185	1.41e-28	104
+765 ../../output/Ab_4-uniprot_blastx.tab
+```
+
+So far, I can interpret that there were 765 hits (no. rows in Ab_4-uniprot_blastx.tab).
