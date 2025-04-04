@@ -1,0 +1,78 @@
+---
+title: "01-blast"
+format: html
+editor: visual
+---
+
+I'm going to download BLAST and use it to compare it to unknown sequences.
+
+```{bash}
+cd /home/jovyan/applications
+curl -O https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/ncbi-blast-2.16.0+-x64-linux.tar.gz
+tar -xf ncbi-blast-2.16.0+-x64-linux.tar.gz
+```
+
+```{bash}
+/home/jovyan/applications/ncbi-blast-2.16.0+/bin/blastx -h #verify installation
+```
+
+# Make Blast Database
+
+We're using Swiss-Prot in UniProtKB.
+
+```{bash}
+pwd
+```
+
+```{bash}
+cd ../../blastdb #use relative paths!
+
+curl -O https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/uniprot_sprot.fasta.gz
+
+mv uniprot_sprot.fasta.gz uniprot_sprot_r2025_01.fasta.gz
+
+gunzip -k uniprot_sprot_r2025_01.fasta.gz
+
+ls 
+```
+
+```{bash}
+head ../../blastdb/unip* #check the file
+```
+
+```{bash}
+/home/jovyan/applications/ncbi-blast-2.16.0+/bin/makeblastdb \ 
+
+-in ../blastdb/uniprot_sprot_r2025_01.fasta \
+-dbtype prot \
+-out ../blastdb/uniprot_sprot_r2025_01
+```
+
+# Get the query sequence
+
+```{bash}
+curl https://eagle.fish.washington.edu/cnidarian/Ab_4denovo_CLC6_a.fa \
+-k \ 
+> ../blastdb/Ab_4denovo_CLC6_a.fa # curl command not working?
+
+head ../blastdb/Ab_4denovo_CLC6_a.fa
+echo "How many sequences are there?"
+grep -c ">" ../blastdb/Ab_4denovo_CLC6_a.fa
+```
+
+# Run Blast
+
+```{bash}
+../applications/ncbi-blast-2.16.0+/bin/blastx \ 
+-query ../blastdb/Ab_4denovo_CLC6_a.fa \
+-db ../blastdb/uniprot_sprot_r2023_01 \
+-out ../output/Ab_4-uniprot_blastx.tab \
+-evalue 1E-20 \
+-num_threads 20 \
+-max_target_seqs 1 \
+-outfmt 6
+
+head -2 ../output/Ab_4-uniprot_blastx.tab
+wc -l ../output/Ab_4-uniprot_blastx.tab
+
+```
