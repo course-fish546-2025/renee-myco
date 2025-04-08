@@ -1,0 +1,45 @@
+---
+title: "week2"
+format: html
+editor: 
+  markdown: 
+    wrap: sentence
+---
+
+## What do you feel was the most impressive thing you did in class last week was?
+
+Honestly I got BLAST to work and run the query sequence.
+It was a process - I had not used GitHub or command line tools before.
+But very gratifying and exciting.
+
+## What is your weekly goal for making progress on your project? What is the next step?
+
+This week, I want to get 2 metagenome files on Raven, and check them for fungal and bacterial DNA.
+
+## There were two readings this week not from the textbook, meant for two different audiences. Which reading did you get the most out of and why? Do you have any questions regarding the Journal of Shellfish Research paper?
+
+I really liked your paper!
+It was more a higher level view of workflows and rationales designed for students and biologists/ecologists.
+I think the textbook appeals to people with more of a computer science background.
+The textbook has great practical advice and code examples, which I bookmarked.
+But in general I got more of a handle on these pipelines from the article.
+It also inspired me to check out [DNA methylation in fungi](https://www.frontiersin.org/journals/microbiology/articles/10.3389/fmicb.2020.616922/full) and I want to explore it further.
+
+A question I had from the article is whether it is preferable to do your own sequence trimming, or if this is find to leave to a lab (who's doing the sequencing, QC etc).
+Should we have a preference in working with raw vs trimmed files?
+
+## What is your favorite thing about markdown and why?
+
+Markdown's ease and minimalism is really nice to write with.
+I initially started using .md in text editors like Drafts and Byword.
+So using it in R Studio is an easier part of this course for me.
+
+## What is the difference between `curl` and `wget`? When would you used one over the other?
+
+wget is a file downloading tool that can be used recursively.
+It uses FTP, HTTP, and HTTPS protocols.
+It can be used when downloading a large file and is simpler.
+
+curl is more of a data transfer tool.
+It uses more protocols and can follow page redirects.
+They can both resume downloads.
