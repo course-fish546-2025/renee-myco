@@ -26,7 +26,7 @@ pwd
 
 But terminal indicates that it is:
 
-```         
+```{bash}
 /home/jovyan/renee-myco/
 ```
 
@@ -53,7 +53,6 @@ head ../../blastdb/unip* #check the file
 -in ../../blastdb/uniprot_sprot_r2025_01.fasta \
 -dbtype prot \
 -out ../../blastdb/uniprot_sprot_r2025_01
-
 ```
 
 # Get the query sequence
@@ -98,3 +97,71 @@ solid0078_20110412_FRAG_BC_WHITE_WHITE_F3_QV_SE_trimmed_contig_5	sp|Q08013|SSRG_
 ```
 
 So far, I can interpret that there were 765 hits (no. rows in Ab_4-uniprot_blastx.tab).
+
+# Getting more information
+
+Obtaining an annotation table to use with the BLAST output table.
+
+```{bash}
+curl -O -H "Accept: text/plain; format=tsv" "https://rest.uniprot.org/uniprotkb/stream?compressed=true&fields=accession%2Creviewed%2Cid%2Cprotein_name%2Cgene_names%2Corganism_name%2Clength%2Cgo_f%2Cgo%2Cgo_p%2Cgo_c%2Cgo_id%2Ccc_interaction%2Cec%2Cxref_reactome%2Cxref_unipathway%2Cxref_interpro&format=tsv&query=%28%2A%29%20AND%20%28reviewed%3Atrue%29"
+```
+
+❗️This prompted the creation of a new folder 'blast' in my assignments folder, and the information is going into a 32.5MB file there called 'stream'. Something may be off with my working directory; this may need to be moved or modified in some other way.
+
+## Joining blast table with annotation table
+
+```{bash}
+head -2 ../../output/Ab_4-uniprot_blastx.tab
+wc -l ../../output/Ab_4-uniprot_blastx.tab
+```
+
+```{bash}
+tr '|' '\t' < ../../output/Ab_4-uniprot_blastx.tab | head -2
+```
+
+Getting a broken pipe error here. It seems safe to ignore for now but any feedback is helpful.
+
+```{bash}
+tr '|' '\t' < ../../output/Ab_4-uniprot_blastx.tab \
+> ../../output/Ab_4-uniprot_blastx_sep.tab
+```
+
+```{bash}
+head -2 ../data/uniprot_table_r2023_01.tab
+wc -l ../data/uniprot_table_r2023_01.tab
+```
+
+❗️Another
+
+# Creating a table - draft code needs editing!
+
+```{r}
+library(tidyverse)
+library("kableExtra")
+```
+
+Getting back into R and need to install the right packages.
+
+```{r}
+bltabl <- read.csv("../output/Ab_4-uniprot_blastx_sep.tab", sep = '\t', header = FALSE)
+```
+
+```{r}
+spgo <- read.csv("../data/uniprot_table_r2023_01.tab", sep = '\t', header = TRUE)
+```
+
+```{r}
+kbl(
+head(
+  left_join(bltabl, spgo,  by = c("V3" = "Entry")) %>%
+  select(V1, V3, V13, Protein.names, Organism, Gene.Ontology..biological.process., Gene.Ontology.IDs) %>% mutate(V1 = str_replace_all(V1, 
+            pattern = "solid0078_20110412_FRAG_BC_WHITE_WHITE_F3_QV_SE_trimmed", replacement = "Ab"))
+)
+) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+left_join(bltabl, spgo,  by = c("V3" = "Entry")) %>%
+  select(V1, V3, V13, Protein.names, Organism, Gene.Ontology..biological.process., Gene.Ontology.IDs) %>% mutate(V1 = str_replace_all(V1, 
+            pattern = "solid0078_20110412_FRAG_BC_WHITE_WHITE_F3_QV_SE_trimmed", replacement = "Ab")) %>%
+  write_delim("../output/blast_annot_go.tab", delim = '\t')
+```
