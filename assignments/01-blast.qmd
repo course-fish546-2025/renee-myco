@@ -131,9 +131,10 @@ head -2 ../data/uniprot_table_r2023_01.tab
 wc -l ../data/uniprot_table_r2023_01.tab
 ```
 
-❗️Another
+❗️Another issue - there is no uniprot table downloaded. It looks like a API issue?
 
-# Creating a table - draft code needs editing!
+# Creating a table
+The followins is all draft code needs editing!
 
 ```{r}
 library(tidyverse)
