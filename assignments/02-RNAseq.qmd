@@ -4,11 +4,19 @@ format: html
 editor: visual
 ---
 
-Today we will be taking RNA-seq reads off the sequencer, and determining what genes are expressed higher in treatment group A compared to treatments group B. For this we will use Kallisto, which is already installed on Raven. The goal is to generate a plot and table of differentially expressed genes. For this we will be using fastq files. 
+Today we will be taking RNA-seq reads off the sequencer, and determining what genes are expressed higher in treatment group A compared to treatments group B. For this we will use Kallisto, which is already installed on Raven. The goal is to generate a plot and table of differentially expressed genes. For this we will be using fastq files.
 
 # Quality control
 Before embarking on any further analysis, we have to do QC on the data. We can do this using FastQC.
 
 ```{bash}
+pwd
 fastqc input.fastq
+```
+
+# Transcript uantification (Pseudo - alignment)
+After quality control, we quantify the transcript expression levels using Kallisto. Kallisto uses a pseudoalignment approach, which is much faster than traditional alignment-based methods and does not require a reference genome. Kallisto generates transcript-level abundance estimates that can be used for differential expression analysis.
+
+```{bash}
+kallisto quant -i index_file -o output_folder input.fastq
 ```
