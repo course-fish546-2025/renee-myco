@@ -3,7 +3,8 @@ title: "01-bash"
 format: html
 ---
 
-## 
+# Basic commands and navigation
+
 ```{bash}
 whoami
 ```
@@ -11,9 +12,12 @@ whoami
 ```{bash}
 pwd
 ```
+Personal working directory 
+
 ```{bash}
 ls
 ```
+Displays contents of current working directory. 
 
 ```{bash}
 ls -F
@@ -25,12 +29,14 @@ cd ~
 ls
 cd data-shell
 ```
+Using data-shell tutorial. 
+
 ```{bash}
 cd ..
 cd data-shell
 ls
-
 ```
+
 ```{bash}
 cd ..
 cd data-shell
@@ -42,16 +48,20 @@ ls north-pacific-gyre/
 mkdir thesis
 ls -F thesis
 ```
+
 ```{bash}
 cd thesis 
 nano draft.txt
 ```
+Using nano in R is complicated. The keystrokes to save a file actually prompt R to open a new one. We'll have to find a better approach to generating text files using command line. 
+
 ```{bash}
 cd ..
 ls
 cd data-shell
 ls
 ```
+
 ```{bash}
 cd ..
 cd data-shell
@@ -65,6 +75,8 @@ head -1 sorted-lengths
 sort -n lengths | head -1
 wc -l *.pdb | sort -n | head -1
 ```
+wc = word count; sort features, getting a preview of a file via 'head'. 
+
 ```{bash}
 cd ..
 cd data-shell
