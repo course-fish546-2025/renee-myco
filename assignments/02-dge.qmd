@@ -3,13 +3,3 @@ title: "02-dge"
 format: html
 editor: visual
 ---
-
-Today we will be taking RNA-seq reads off the sequencer, and determining what genes are expressed higher in treatment group A compared to treatments group B. For this we will use Kallisto, which is already installed on Raven. The goal is to generate a plot and table of differentially expressed genes.
-
-# Downloading reference
-
-```{bash}
-cd ../data
-curl --insecure -O https://gannet.fish.washington.edu/seashell/bu-github/nb-2023/Cgigas/data/rna.fna
-```
-This code grabs the Pacific oyster fasta file of genes. (Note: still awaiting permissiosn to create a directory.)

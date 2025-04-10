@@ -1,0 +1,14 @@
+---
+title: "02-RNAseq"
+format: html
+editor: visual
+---
+
+Today we will be taking RNA-seq reads off the sequencer, and determining what genes are expressed higher in treatment group A compared to treatments group B. For this we will use Kallisto, which is already installed on Raven. The goal is to generate a plot and table of differentially expressed genes. For this we will be using fastq files. 
+
+# Quality control
+Before embarking on any further analysis, we have to do QC on the data. We can do this using FastQC.
+
+```{bash}
+fastqc input.fastq
+```
