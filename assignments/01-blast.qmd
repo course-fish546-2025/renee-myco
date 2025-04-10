@@ -24,13 +24,7 @@ We're using Swiss-Prot in UniProtKB.
 pwd
 ```
 
-But terminal indicates that it is:
-
-```{bash}
-/home/jovyan/renee-myco/
-```
-
-However, the relative paths that work in the scripts indicate that indeed the assignments folder is the working directory. It's a mystery.
+Our working directory is /home/jovyan/renee-myco/assignments, where this Quarto file is located. So this is the wd that this document defaults to. (Realizing this sooner would have saved me several headaches.)
 
 ```{bash}
 cd ../../blastdb
@@ -48,11 +42,38 @@ ls
 head ../../blastdb/unip* #check the file
 ```
 
+Looking good so far:
+
+```         
+==> ../../blastdb/uniprot_sprot_r2025_01.fasta <==
+>sp|Q6GZX4|001R_FRG3G Putative transcription factor 001R OS=Frog virus 3 (isolate Goorha) OX=654924 GN=FV3-001R PE=4 SV=1
+MAFSAEDVLKEYDRRRRMEALLLSLYYPNDRKLLDYKEWSPPRVQVECPKAPVEWNNPPS
+EKGLIVGHFSGIKYKGEKAQASEVDVNKMCCWVSKFKDAMRRYQGIQTCKIPGKVLSDLD
+AKIKAYNLTVEGVEGFVRYSRVTKQHVAAFLKELRHSKQYENVNLIHYILTDKRVDIQHL
+EKDLVKDFKALVESAHRMRQGHMINVKYILYQLLKKHGHGPDGPDILTVKTGSKGVLYDD
+SFRKIYTDLGWKFTPL
+>sp|Q6GZX3|002L_FRG3G Uncharacterized protein 002L OS=Frog virus 3 (isolate Goorha) OX=654924 GN=FV3-002L PE=4 SV=1
+MSIIGATRLQNDKSDTYSAGPCYAGGCSAFTPRGTCGKDWDLGEQTCASGFCTSQPLCAR
+IKKTQVCGLRYSSKGKDPLVSAEWDSRGAPYVRCTYDADLIDTQAQVDQFVSMFGESPSL
+AERYCMRGVKNTAGELVSRVSSDADPAGGWCRKWYSAHRGPDQDAALGSFCIKNPGAADC
+```
+
 ```{bash}
 /home/jovyan/applications/ncbi-blast-2.16.0+/bin/makeblastdb \
 -in ../../blastdb/uniprot_sprot_r2025_01.fasta \
 -dbtype prot \
 -out ../../blastdb/uniprot_sprot_r2025_01
+```
+
+```         
+Building a new DB, current time: 04/10/2025 10:45:01
+New DB name:   /home/jovyan/blastdb/uniprot_sprot_r2025_01
+New DB title:  ../../blastdb/uniprot_sprot_r2025_01.fasta
+Sequence type: Protein
+Deleted existing Protein BLAST database named /home/jovyan/blastdb/uniprot_sprot_r2025_01
+Keep MBits: T
+Maximum file size: 3000000000B
+Adding sequences from FASTA; added 572970 sequences in 16.0218 seconds.
 ```
 
 # Get the query sequence
@@ -67,7 +88,7 @@ echo "How many sequences are there?"
 grep -c ">" ../../blastdb/Ab_4denovo_CLC6_a.fa
 ```
 
-There were some hiccups here, mainly with hidden characters (extra spaces after slashes) with the curl command. However, I was able to confirm 5490 sequences. I keep having to change the relative file path and hope I didn't miss anything too badly with the initial project setup.
+There were some hiccups here, mainly with hidden characters (extra spaces after slashes) with the curl command. However, I was able to confirm 5490 sequences.
 
 # Run BLAST
 
@@ -83,16 +104,15 @@ There were some hiccups here, mainly with hidden characters (extra spaces after 
 
 head -2 ../../output/Ab_4-uniprot_blastx.tab
 wc -l ../../output/Ab_4-uniprot_blastx.tab
-
 ```
 
-Running BLAST took a long time - about 45 minutes. Here was the output:
+Running BLAST took about 45 minutes. Here was the output:
 
-```{bash}
+```         
 Warning: [Query 5476-5490] Examining 5 or more matches is recommended
 Warning: [Query 5476-5490] Number of threads was reduced to 16 to match the number of available CPUs
-solid0078_20110412_FRAG_BC_WHITE_WHITE_F3_QV_SE_trimmed_contig_3	sp|O42248|GBLP_DANRE	82.456	171	30	0	1	513	35	205	2.83e-103	301
-solid0078_20110412_FRAG_BC_WHITE_WHITE_F3_QV_SE_trimmed_contig_5	sp|Q08013|SSRG_RAT	75.385	65	16	0	3	197	121	185	1.41e-28	104
+solid0078_20110412_FRAG_BC_WHITE_WHITE_F3_QV_SE_trimmed_contig_3    sp|O42248|GBLP_DANRE    82.456  171 30  0   1   513 35  205 2.83e-103   301
+solid0078_20110412_FRAG_BC_WHITE_WHITE_F3_QV_SE_trimmed_contig_5    sp|Q08013|SSRG_RAT  75.385  65  16  0   3   197 121 185 1.41e-28    104
 765 ../../output/Ab_4-uniprot_blastx.tab
 ```
 
@@ -102,11 +122,9 @@ So far, I can interpret that there were 765 hits (no. rows in Ab_4-uniprot_blast
 
 Obtaining an annotation table to use with the BLAST output table.
 
-```{bash}
-curl -O -H "Accept: text/plain; format=tsv" "https://rest.uniprot.org/uniprotkb/stream?compressed=true&fields=accession%2Creviewed%2Cid%2Cprotein_name%2Cgene_names%2Corganism_name%2Clength%2Cgo_f%2Cgo%2Cgo_p%2Cgo_c%2Cgo_id%2Ccc_interaction%2Cec%2Cxref_reactome%2Cxref_unipathway%2Cxref_interpro&format=tsv&query=%28%2A%29%20AND%20%28reviewed%3Atrue%29"
+```{r}
+spgo <- read.csv("https://gannet.fish.washington.edu/seashell/snaps/uniprot_table_r2023_01.tab", sep = '\t', header = TRUE)
 ```
-
-❗️This prompted the creation of a new folder 'blast' in my assignments folder, and the information is going into a 32.5MB file there called 'stream'. Something may be off with my working directory; this may need to be moved or modified in some other way.
 
 ## Joining blast table with annotation table
 
@@ -115,43 +133,57 @@ head -2 ../../output/Ab_4-uniprot_blastx.tab
 wc -l ../../output/Ab_4-uniprot_blastx.tab
 ```
 
+```         
+solid0078_20110412_FRAG_BC_WHITE_WHITE_F3_QV_SE_trimmed_contig_3    sp|O42248|GBLP_DANRE    82.456  171 30  0   1   513 35  205 2.83e-103   301
+solid0078_20110412_FRAG_BC_WHITE_WHITE_F3_QV_SE_trimmed_contig_5    sp|Q08013|SSRG_RAT  75.385  65  16  0   3   197 121 185 1.41e-28    104
+81 ../../output/Ab_4-uniprot_blastx.tab
+```
+
 ```{bash}
 tr '|' '\t' < ../../output/Ab_4-uniprot_blastx.tab | head -2
 ```
 
-Getting a broken pipe error here. It seems safe to ignore for now but any feedback is helpful.
+```         
+solid0078_20110412_FRAG_BC_WHITE_WHITE_F3_QV_SE_trimmed_contig_3    sp  O42248  GBLP_DANRE  82.456  171 30  0   1   513 35  205 2.83e-103   301
+solid0078_20110412_FRAG_BC_WHITE_WHITE_F3_QV_SE_trimmed_contig_5    sp  Q08013  SSRG_RAT    75.385  65  16  0   3   197 121 185 1.41e-28    104
+```
 
 ```{bash}
 tr '|' '\t' < ../../output/Ab_4-uniprot_blastx.tab \
 > ../../output/Ab_4-uniprot_blastx_sep.tab
+ls ../../output
+```
+
+```         
+Ab_4-uniprot_blastx.tab
+Ab_4-uniprot_blastx_sep.tab
 ```
 
 ```{bash}
-head -2 ../data/uniprot_table_r2023_01.tab
-wc -l ../data/uniprot_table_r2023_01.tab
+head -2 ../../output/Ab_4-uniprot_blastx.tab
+wc -l ../../output/Ab_4-uniprot_blastx.tab
 ```
 
-❗️Another issue - there is no uniprot table downloaded. It looks like a API issue?
+```         
+solid0078_20110412_FRAG_BC_WHITE_WHITE_F3_QV_SE_trimmed_contig_3    sp|O42248|GBLP_DANRE    82.456  171 30  0   1   513 35  205 2.83e-103   301
+solid0078_20110412_FRAG_BC_WHITE_WHITE_F3_QV_SE_trimmed_contig_5    sp|Q08013|SSRG_RAT  75.385  65  16  0   3   197 121 185 1.41e-28    104
+81 ../../output/Ab_4-uniprot_blastx.tab
+```
 
 # Creating a table
-The followins is all draft code needs editing!
+
+The following is all draft code needs editing!
 
 ```{r}
 library(tidyverse)
 library("kableExtra")
 ```
 
-Getting back into R and need to install the right packages.
-
 ```{r}
-bltabl <- read.csv("../output/Ab_4-uniprot_blastx_sep.tab", sep = '\t', header = FALSE)
+bltabl <- read.csv("../../output/Ab_4-uniprot_blastx_sep.tab", sep = '\t', header = FALSE)
 ```
 
-```{r}
-spgo <- read.csv("../data/uniprot_table_r2023_01.tab", sep = '\t', header = TRUE)
-```
-
-```{r}
+```{r echo=TRUE}
 kbl(
 head(
   left_join(bltabl, spgo,  by = c("V3" = "Entry")) %>%
@@ -164,5 +196,5 @@ head(
 left_join(bltabl, spgo,  by = c("V3" = "Entry")) %>%
   select(V1, V3, V13, Protein.names, Organism, Gene.Ontology..biological.process., Gene.Ontology.IDs) %>% mutate(V1 = str_replace_all(V1, 
             pattern = "solid0078_20110412_FRAG_BC_WHITE_WHITE_F3_QV_SE_trimmed", replacement = "Ab")) %>%
-  write_delim("../output/blast_annot_go.tab", delim = '\t')
+  write_delim("../../output/blast_annot_go.tab", delim = '\t')
 ```
