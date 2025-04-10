@@ -1,0 +1,32 @@
+---
+title: "Rhizospheric fungal/bacteria metagenome project"
+format: html
+editor: 
+  markdown: 
+    wrap: sentence
+---
+
+# Upload raw data files to server
+
+The goal for week 2 is to upload fastq files to Raven server.
+Note that this needs to be done in the local terminal, not the one on the server.
+
+```{bash}
+scp "/Volumes/CRUZER16GB/F1B-KM40_R1_001.fastq.gz" \
+rendavis@raven.fish.washington.edu:/home/shared/16TB_HDD_01/fish546/renee/
+```
+
+Ok that worked, now to upload the rest using rsync instead (better for handling multiple files, fewer chances of duplicates, conflicts etc).
+
+```{bash}
+rsync -av --progress \
+    /Volumes/CRUZER16GB/*.fastq.gz \
+    rendavis@raven.fish.washington.edu:/home/shared/16TB_HDD_01/fish546/renee/
+```
+
+These are R1/R2 (forward and reverse reads) and will have to be merged.
+That will be next week.
+I can attempt to follow [this guide](https://www.cureffi.org/2012/12/19/forward-and-reverse-reads-in-paired-end-sequencing/).
+Also, need to create some subdirectories to better organize this as there will be some intermediary files.
+
+Question: is this code reproducible?
