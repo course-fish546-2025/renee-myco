@@ -4,19 +4,174 @@ format: html
 editor: visual
 ---
 
+Note: unfinished lecture exercise. To complete: https://sr320.github.io/course-fish546-2025/lectures/02-rna-seq.html
+
 Today we will be taking RNA-seq reads off the sequencer, and determining what genes are expressed higher in treatment group A compared to treatments group B. For this we will use Kallisto, which is already installed on Raven. The goal is to generate a plot and table of differentially expressed genes. For this we will be using fastq files.
 
-# Quality control
-Before embarking on any further analysis, we have to do QC on the data. We can do this using FastQC.
+# RNA seq
 
 ```{bash}
-pwd
-fastqc input.fastq
+/home/shared/kallisto/kallisto
 ```
 
-# Transcript uantification (Pseudo - alignment)
-After quality control, we quantify the transcript expression levels using Kallisto. Kallisto uses a pseudoalignment approach, which is much faster than traditional alignment-based methods and does not require a reference genome. Kallisto generates transcript-level abundance estimates that can be used for differential expression analysis.
+Confirming installation of kallisto 0.46.1.
+
+# Downloading reference genome
 
 ```{bash}
-kallisto quant -i index_file -o output_folder input.fastq
+mkdir data
+cd data
+curl --insecure -O https://gannet.fish.washington.edu/seashell/bu-github/nb-2023/Cgigas/data/rna.fna
+```
+
+This code is indexing the file rna.fna into the data directory. The directory has been added to .gitignore.
+
+```{bash}
+/home/shared/kallisto/kallisto \
+index -i \
+data/cgigas_roslin_rna.index \
+data/rna.fna
+```
+
+This added the cgigas_roslin_rna.index file to the data directory.
+
+# Downloading sequence reads
+
+```{bash}
+cd data 
+wget --recursive --no-parent --no-directories \
+--no-check-certificate \
+--accept '*.fastq.gz' \
+https://gannet.fish.washington.edu/seashell/bu-github/nb-2023/Cgigas/data/nopp/
+```
+
+Downloaded several fastq files.
+
+```{bash}
+mkdir output/kallisto_01
+
+find data/*fastq.gz \
+| xargs basename -s _L001_R1_001.fastq.gz | xargs -I{} /home/shared/kallisto/kallisto \
+quant -i data/cgigas_roslin_rna.index \
+-o output/kallisto_01/{} \
+-t 24 \
+--single -l 100 -s 10 data/{}_L001_R1_001.fastq.gz
+```
+
+This creates an output directory and populates it with sequence reads.
+
+# Transcript quantification
+
+Now we quantify the transcript expression levels using Kallisto. From the lecture notes: "Kallisto uses a pseudoalignment approach, which is much faster than traditional alignment-based methods and does not require a reference genome."
+
+```{bash}
+perl /home/shared/trinityrnaseq-v2.12.0/util/abundance_estimates_to_matrix.pl \
+--est_method kallisto \
+    --gene_trans_map none \
+    --out_prefix output/kallisto_01 \
+    --name_sample_by_basedir \
+    output/kallisto_01/D54_S145/abundance.tsv \
+    output/kallisto_01/D56_S136/abundance.tsv \
+    output/kallisto_01/D58_S144/abundance.tsv \
+    output/kallisto_01/M45_S140/abundance.tsv \
+    output/kallisto_01/M48_S137/abundance.tsv \
+    output/kallisto_01/M89_S138/abundance.tsv \
+    output/kallisto_01/D55_S146/abundance.tsv \
+    output/kallisto_01/D57_S143/abundance.tsv \
+    output/kallisto_01/D59_S142/abundance.tsv \
+    output/kallisto_01/M46_S141/abundance.tsv \
+    output/kallisto_01/M49_S139/abundance.tsv \
+    output/kallisto_01/M90_S147/abundance.tsv \
+    output/kallisto_01/N48_S194/abundance.tsv \
+    output/kallisto_01/N50_S187/abundance.tsv \
+    output/kallisto_01/N52_S184/abundance.tsv \
+    output/kallisto_01/N54_S193/abundance.tsv \
+    output/kallisto_01/N56_S192/abundance.tsv \
+    output/kallisto_01/N58_S195/abundance.tsv \
+    output/kallisto_01/N49_S185/abundance.tsv \
+    output/kallisto_01/N51_S186/abundance.tsv \
+    output/kallisto_01/N53_S188/abundance.tsv \
+    output/kallisto_01/N55_S190/abundance.tsv \
+    output/kallisto_01/N57_S191/abundance.tsv \
+    output/kallisto_01/N59_S189/abundance.tsv
+```
+
+This code runs the abundance_estimates_to_matrix.pl script from Trinity RNA-seq to create a gene expression matrix from Kallisto output files.
+
+# Differential expression analysis
+
+Now we will perform differential expression analysis to identify differentially expressed genes (DEGs) between a control and a desiccated condition. First we need to install DESeq2 from BiocManager and get the other packages set up.
+
+```{r}
+#install.packages("BioManager")
+#BiocManager::install("DESeq2")
+library(DESeq2)
+library(tidyverse)
+library(pheatmap)
+library(RColorBrewer)
+library(data.table)
+```
+
+```{r echo=TRUE}
+countmatrix <- read.delim("output/kallisto_01.isoform.counts.matrix", header = TRUE, sep = '\t')
+rownames(countmatrix) <- countmatrix$X
+countmatrix <- countmatrix[,-1]
+head(countmatrix)
+```
+
+We created a table showing differentially expressed genes.
+
+```{r echo=TRUE}
+countmatrix <- round(countmatrix, 0)
+str(countmatrix)
+```
+
+```{r}
+deseq2.colData <- data.frame(condition=factor(c(rep("control", 12), rep("desicated", 12))), 
+                             type=factor(rep("single-read", 24)))
+rownames(deseq2.colData) <- colnames(data)
+deseq2.dds <- DESeqDataSetFromMatrix(countData = countmatrix,
+                                     colData = deseq2.colData, 
+                                     design = ~ condition)
+```
+
+Here we are converting counts to integer mode...
+
+```{r}
+deseq2.dds <- DESeq(deseq2.dds)
+deseq2.res <- results(deseq2.dds)
+deseq2.res <- deseq2.res[order(rownames(deseq2.res)), ]
+```
+
+```{r}
+head(deseq2.res)
+```
+
+This actually previews our analysis. log2 fold change (MLE): condition desicated vs control Wald test p-value: condition desicated vs control DataFrame with 6 rows and 6 columns etc...
+
+```{r}
+# Count number of hits with adjusted p-value less then 0.05
+dim(deseq2.res[!is.na(deseq2.res$padj) & deseq2.res$padj <= 0.05, ])
+```
+
+prints - 607 6 - which is the number of hits?
+
+# Creating a plot
+
+```{r}
+tmp <- deseq2.res
+# The main plot
+plot(tmp$baseMean, tmp$log2FoldChange, pch=20, cex=0.45, ylim=c(-3, 3), log="x", col="darkgray",
+     main="DEG Dessication  (pval <= 0.05)",
+     xlab="mean of normalized counts",
+     ylab="Log2 Fold Change")
+# Getting the significant points and plotting them again so they're a different color
+tmp.sig <- deseq2.res[!is.na(deseq2.res$padj) & deseq2.res$padj <= 0.05, ]
+points(tmp.sig$baseMean, tmp.sig$log2FoldChange, pch=20, cex=0.45, col="red")
+# 2 FC lines
+abline(h=c(-1,1), col="blue")
+```
+
+```{r}
+write.table(tmp.sig, "output/DEGlist.tab", row.names = T)
 ```

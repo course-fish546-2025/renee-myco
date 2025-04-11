@@ -1,0 +1,5 @@
+Module	Section	Sample Name	Source
+FastQC	all_sections	F1B-KM40_R1_001	/home/shared/8TB_HDD_02/rendavis/renee-myco/project/output/F1B-KM40_R1_001_fastqc.zip
+FastQC	all_sections	F1B-KM40_R2_001	/home/shared/8TB_HDD_02/rendavis/renee-myco/project/output/F1B-KM40_R2_001_fastqc.zip
+FastQC	all_sections	F2R-KM41_R1_001	/home/shared/8TB_HDD_02/rendavis/renee-myco/project/output/F2R-KM41_R1_001_fastqc.zip
+FastQC	all_sections	F2R-KM41_R2_001	/home/shared/8TB_HDD_02/rendavis/renee-myco/project/output/F2R-KM41_R2_001_fastqc.zip

@@ -3,3 +3,10 @@ title: "02-dge"
 format: html
 editor: visual
 ---
+
+# Downloading reference genome
+```{bash}
+cd data
+curl --insecure -O https://gannet.fish.washington.edu/seashell/bu-github/nb-2023/Cgigas/data/rna.fna
+```
+

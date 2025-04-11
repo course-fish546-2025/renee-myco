@@ -1,6 +1,9 @@
+# R studio junk
 .Rproj.user
 .Rhistory
 .RData
 .Ruserdata
+
+# Ignore large files
 assignments/data/*
 assignments/output/*
