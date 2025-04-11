@@ -12,6 +12,7 @@ The goal for week 2 is to upload fastq files to Raven server.
 Note that this needs to be done from the local terminal, not the one on the server.
 
 ```{bash}
+# move files from lab drive to Raven
 scp "/Volumes/CRUZER16GB/F1B-KM40_R1_001.fastq.gz" \
 rendavis@raven.fish.washington.edu:/home/shared/16TB_HDD_01/fish546/renee/
 ```
@@ -19,6 +20,7 @@ rendavis@raven.fish.washington.edu:/home/shared/16TB_HDD_01/fish546/renee/
 Ok that worked, now to upload the rest using rsync instead (better for handling multiple files, fewer chances of duplicates, conflicts etc).
 
 ```{bash}
+# move remaining files from lab drive to Raven
 rsync -av --progress \
     /Volumes/CRUZER16GB/*.fastq.gz \
     rendavis@raven.fish.washington.edu:/home/shared/16TB_HDD_01/fish546/renee/
@@ -30,6 +32,7 @@ I have been told that QC has been run on these, but we won't take that at face v
 For this we will use FastQC.
 
 ```{bash}
+# fun FastQC on the fastq files
 /home/shared/FastQC-0.12.1/fastqc -t 36 -o output /home/shared/16TB_HDD_01/fish546/renee/*.fastq.gz
 ```
 
