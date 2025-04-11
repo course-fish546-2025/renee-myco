@@ -7,3 +7,4 @@
 # Ignore large files
 assignments/data/*
 assignments/output/*
+rna.fna
