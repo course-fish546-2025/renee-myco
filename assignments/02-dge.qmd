@@ -9,4 +9,23 @@ editor: visual
 cd data
 curl --insecure -O https://gannet.fish.washington.edu/seashell/bu-github/nb-2023/Cgigas/data/rna.fna
 ```
+Downloading reference genome to the data folder. 
 
+```{bash}
+/home/shared/kallisto/kallisto \
+index -i \
+data/cgigas_roslin_rna.index \
+data/rna.fna
+```
+Renaming and indexing rna.fna.
+
+# Downloading sequence reads
+```{bash}
+cd data
+wget --recursive --no-parent --no-directories \
+--no-check-certificate \
+--accept '*.fastq.gz' \
+https://gannet.fish.washington.edu/seashell/bu-github/nb-2023/Cgigas/data/nopp/
+```
+
+...the rest of the workflow continues in 02-RNAseq.qmd. 
