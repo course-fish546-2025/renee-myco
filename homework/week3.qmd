@@ -19,6 +19,9 @@ Inline code actually inserts objects/data in the text. So if you're talking abou
 ## What’s gone wrong with this code? Why are the points not blue?
 The color argument should go outside aes, and in the geom function. So instead of turning the data points blue, it's just creating a legend. 
 
+## Of the many things we have done in class the past two weeks, what is one aspect you would like to revisit and spend more time on?
+We have done so much! Personally, I could use more focus on interpretation and application of BLAST, RNA seq and DGE results. 
+
 ```{r}
 ggplot(data = mpg) + 
   geom_point(mapping = aes(x = displ, y = hwy, color = "blue"))
