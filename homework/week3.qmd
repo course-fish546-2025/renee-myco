@@ -1,0 +1,25 @@
+---
+title: "week3"
+format: html
+---
+
+## An R Markdown file is plain text file that contains what 3 important types of content?
+A YAML header, code chunks, and text along with simple formatting like headers (###), bold/italics, etc. 
+
+## What is a chunk and how do you add them? of the many chunk options which one do you think you will use the most and why? How is inline code different than code chunks?
+A code chunk is a way to run code in an R Markdown document. Of the 3 listed:
+"The keyboard shortcut Cmd/Ctrl + Alt + I
+The “Insert” button icon in the editor toolbar.
+By manually typing the chunk delimiters ```{r} and ```."
+
+I will most likely use the keyboard shortcut. I've been typing it manually and I'm pretty excited to move on from that. 
+
+Inline code actually inserts objects/data in the text. So if you're talking about your data or its properties, it's a useful feature. It will probably require more use of the format tools to improve in text readability. 
+
+## What’s gone wrong with this code? Why are the points not blue?
+The color argument should go outside aes, and in the geom function. So instead of turning the data points blue, it's just creating a legend. 
+
+```{r}
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy, color = "blue"))
+```
