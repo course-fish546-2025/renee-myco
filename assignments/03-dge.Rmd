@@ -11,7 +11,26 @@ output:
     code_folding: show
 ---
 
-For this exercise, we will be taking RNA-seq reads off the sequencer (in the form of FASTQ files) and determining what genes are expressed higher in treatment group A compared to treatment group B. For this we will use **Kallisto**, which allows us to quantify transcription levels. The goal is to generate a volcano plot and table of differentially expressed genes.
+```{r setup, include=FALSE}
+#install.packages("BioManager")
+#BiocManager::install("DESeq2")
+library(DESeq2)
+library(tidyverse)
+library(pheatmap)
+library(RColorBrewer)
+library(data.table)
+knitr::opts_chunk$set(
+  echo = TRUE,         # Display code chunks
+  eval = TRUE,         # Evaluate code chunks 
+  warning = FALSE,     # Hide warnings
+  message = FALSE,     # Hide messages
+  fig.width = 6,       # Set plot width in inches
+  fig.height = 4,      # Set plot height in inches
+  fig.align = "center" # Align plots to the center
+)
+```
+
+For this exercise, we will be taking RNA-seq reads off the sequencer in the form of FASTQ files and determining what genes are expressed higher in treatment group A compared to treatment group B. For this we will use **Kallisto**, which allows us to quantify transcription levels. The goal is to generate a volcano plot, a table of differentially expressed genes, and other helpful visualizations to assess
 
 # Kallisto installation
 
@@ -23,7 +42,7 @@ This code confirms installation of the Kallisto software.
 
 # Downloading reference genome
 
-```{bash}
+```{bash, eval = FALSE}
 mkdir data  #creates a data folder
 cd data
 curl --insecure -O https://gannet.fish.washington.edu/seashell/bu-github/nb-2023/Cgigas/data/rna.fna  #downloads the reference genome 
@@ -31,7 +50,7 @@ curl --insecure -O https://gannet.fish.washington.edu/seashell/bu-github/nb-2023
 
 This code is downloading the file rna.fna into the data directory.
 
-```{bash}
+```{bash, eval = FALSE}
 /home/shared/kallisto/kallisto \
 index -i \
 data/cgigas_roslin_rna.index \
@@ -42,9 +61,9 @@ This added the cgigas_roslin_rna.index file to the data directory.
 
 # Downloading sequence reads
 
-```{bash}
+```{bash, eval = FALSE}
 cd data 
-wget --recursive --no-parent --no-directories \
+wget --recursive --no-parent --no-directories \  #another command to get a file from a URL
 --no-check-certificate \
 --accept '*.fastq.gz' \
 https://gannet.fish.washington.edu/seashell/bu-github/nb-2023/Cgigas/data/nopp/
@@ -52,7 +71,7 @@ https://gannet.fish.washington.edu/seashell/bu-github/nb-2023/Cgigas/data/nopp/
 
 This code downloads several fastq files into the data folder.
 
-```{bash}
+```{bash, eval = FALSE}
 mkdir output/kallisto_01
 
 find data/*fastq.gz \
@@ -69,7 +88,7 @@ This creates an output directory and populates it with sequence reads.
 
 Now we quantify the transcript expression levels using Kallisto. From the lecture notes: "Kallisto uses a pseudoalignment approach, which is much faster than traditional alignment-based methods and does not require a reference genome."
 
-```{bash}
+```{bash, eval = FALSE}
 perl /home/shared/trinityrnaseq-v2.12.0/util/abundance_estimates_to_matrix.pl \
 --est_method kallisto \
     --gene_trans_map none \
@@ -105,19 +124,9 @@ This code runs the abundance_estimates_to_matrix.pl script from **Trinity RNA-se
 
 # Differential expression analysis
 
-Now we will perform **differential expression analysis** to identify differentially expressed genes (DEGs) between a control and a desiccated condition. First we need to install **DESeq2** from BiocManager and get the other packages set up.
+Now we will perform **differential expression analysis** to identify differentially expressed genes (DEGs) between a control and a desiccated condition.
 
 ```{r}
-#install.packages("BioManager")
-#BiocManager::install("DESeq2")
-library(DESeq2)
-library(tidyverse)
-library(pheatmap)
-library(RColorBrewer)
-library(data.table)
-```
-
-```{r echo=TRUE}
 countmatrix <- read.delim("output/kallisto_01.isoform.counts.matrix", header = TRUE, sep = '\t')
 rownames(countmatrix) <- countmatrix$X
 countmatrix <- countmatrix[,-1]
@@ -126,7 +135,7 @@ head(countmatrix)
 
 We created a table showing differentially expressed genes.
 
-```{r echo=TRUE}
+```{r}
 countmatrix <- round(countmatrix, 0)
 str(countmatrix)
 ```
@@ -140,7 +149,7 @@ deseq2.dds <- DESeqDataSetFromMatrix(countData = countmatrix,
                                      design = ~ condition)
 ```
 
-Here we are converting counts to integer mode...
+Below we convert counts to integer mode.
 
 ```{r}
 deseq2.dds <- DESeq(deseq2.dds)
@@ -152,55 +161,63 @@ deseq2.res <- deseq2.res[order(rownames(deseq2.res)), ]
 head(deseq2.res)
 ```
 
-This actually previews our analysis. log2 fold change (MLE): condition desicated vs control Wald test p-value: condition desicated vs control DataFrame with 6 rows and 6 columns etc...
+This actually previews our analysis. log2 fold change (MLE): condition dessicated vs control Wald test p-value: condition desicated vs control DataFrame with 6 rows and 6 columns.
 
-```{r}
+```{r, eval = FALSE}
 # Count number of hits with adjusted p-value less then 0.05
 dim(deseq2.res[!is.na(deseq2.res$padj) & deseq2.res$padj <= 0.05, ])
 ```
 
-prints - 607 6 - which is the number of hits?
+We have 607 significantly differentially expressed genes, based on padj \<= 0.05. There are 6 columns of data for each.
 
 # Creating a plot
 
 ```{r}
 tmp <- deseq2.res
+
 # The main plot
 plot(tmp$baseMean, tmp$log2FoldChange, pch=20, cex=0.45, ylim=c(-3, 3), log="x", col="darkgray",
      main="DEG Dessication  (pval <= 0.05)",
      xlab="mean of normalized counts",
      ylab="Log2 Fold Change")
-# Getting the significant points and plotting them again so they're a different color
+
+#Getting the significant points and plotting them again so they're a different color
 tmp.sig <- deseq2.res[!is.na(deseq2.res$padj) & deseq2.res$padj <= 0.05, ]
 points(tmp.sig$baseMean, tmp.sig$log2FoldChange, pch=20, cex=0.45, col="red")
 # 2 FC lines
 abline(h=c(-1,1), col="blue")
 ```
-
+Now we save the differentially expressed genes (DEGs) to a file.
 ```{r}
 write.table(tmp.sig, "output/DEGlist.tab", row.names = T)
 ```
 
 # PCA plot
+
 We can also take the data and see if samples cluster by condition (control vs desiccated).
+
 ```{r}
 vsd <- vst(deseq2.dds, blind = FALSE)
 plotPCA(vsd, intgroup = "condition") +
   ggtitle("PCA of RNA-Seq Samples (vsd transformed)")
 ```
+There is some grouping/striation between the 2 conditions. So dessication may explain the variation. 
 
 # Heatmap of top DEGs
+
 ```{r}
-top_genes <- head(order(deseq2.res$padj), 50)  #pulls the top DEGs
-mat <- assay(vsd)[top_genes, ]
-mat <- mat - rowMeans(mat)
+top_genes <- head(order(deseq2.res$padj), 50)  # pulls the top DEGs
+mat <- assay(vsd)[top_genes, ]  # extract expression values for those genes
+mat <- mat - rowMeans(mat) #centers the rows
+
+ann_col <- as.data.frame(colData(vsd)[, "condition", drop = FALSE])  #annotation dataframe
+rownames(ann_col) <- colnames(mat)  # ensures rownames match matrix colnames
 
 pheatmap(mat,
          cluster_rows = TRUE,
          cluster_cols = TRUE,
-         annotation_col = deseq2.colData,
+         annotation_col = ann_col,
          show_rownames = FALSE,
          fontsize_col = 8,
          main = "Top 50 Differentially Expressed Genes")
 ```
-
