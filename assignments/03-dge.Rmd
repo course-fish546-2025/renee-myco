@@ -1,28 +1,35 @@
 ---
-title: "02-RNAseq"
-format: html
-editor: visual
+title: "RNA Sequencing and Differential Gene Expression"
+author: "Renee Davis"
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
+output: 
+  html_document:
+    theme: readable
+    toc: true
+    toc_float: true
+    number_sections: true
+    code_folding: show
 ---
 
-Today we will be taking RNA-seq reads off the sequencer, and determining what genes are expressed higher in treatment group A compared to treatments group B. For this we will use Kallisto, which is already installed on Raven. The goal is to generate a plot and table of differentially expressed genes. For this we will be using fastq files.
+For this exercise, we will be taking RNA-seq reads off the sequencer (in the form of FASTQ files) and determining what genes are expressed higher in treatment group A compared to treatment group B. For this we will use **Kallisto**, which allows us to quantify transcription levels. The goal is to generate a volcano plot and table of differentially expressed genes.
 
-# RNA seq
+# Kallisto installation
 
-```{bash}
+```{bash, eval = FALSE}
 /home/shared/kallisto/kallisto
 ```
 
-Confirming installation of kallisto 0.46.1.
+This code confirms installation of the Kallisto software.
 
 # Downloading reference genome
 
 ```{bash}
-mkdir data
+mkdir data  #creates a data folder
 cd data
-curl --insecure -O https://gannet.fish.washington.edu/seashell/bu-github/nb-2023/Cgigas/data/rna.fna
+curl --insecure -O https://gannet.fish.washington.edu/seashell/bu-github/nb-2023/Cgigas/data/rna.fna  #downloads the reference genome 
 ```
 
-This code is indexing the file rna.fna into the data directory. The directory has been added to .gitignore.
+This code is downloading the file rna.fna into the data directory.
 
 ```{bash}
 /home/shared/kallisto/kallisto \
@@ -43,7 +50,7 @@ wget --recursive --no-parent --no-directories \
 https://gannet.fish.washington.edu/seashell/bu-github/nb-2023/Cgigas/data/nopp/
 ```
 
-Downloaded several fastq files.
+This code downloads several fastq files into the data folder.
 
 ```{bash}
 mkdir output/kallisto_01
@@ -94,11 +101,11 @@ perl /home/shared/trinityrnaseq-v2.12.0/util/abundance_estimates_to_matrix.pl \
     output/kallisto_01/N59_S189/abundance.tsv
 ```
 
-This code runs the abundance_estimates_to_matrix.pl script from Trinity RNA-seq to create a gene expression matrix from Kallisto output files.
+This code runs the abundance_estimates_to_matrix.pl script from **Trinity RNA-seq** to create a gene expression matrix from Kallisto output files.
 
 # Differential expression analysis
 
-Now we will perform differential expression analysis to identify differentially expressed genes (DEGs) between a control and a desiccated condition. First we need to install DESeq2 from BiocManager and get the other packages set up.
+Now we will perform **differential expression analysis** to identify differentially expressed genes (DEGs) between a control and a desiccated condition. First we need to install **DESeq2** from BiocManager and get the other packages set up.
 
 ```{r}
 #install.packages("BioManager")
@@ -173,3 +180,27 @@ abline(h=c(-1,1), col="blue")
 ```{r}
 write.table(tmp.sig, "output/DEGlist.tab", row.names = T)
 ```
+
+# PCA plot
+We can also take the data and see if samples cluster by condition (control vs desiccated).
+```{r}
+vsd <- vst(deseq2.dds, blind = FALSE)
+plotPCA(vsd, intgroup = "condition") +
+  ggtitle("PCA of RNA-Seq Samples (vsd transformed)")
+```
+
+# Heatmap of top DEGs
+```{r}
+top_genes <- head(order(deseq2.res$padj), 50)  #pulls the top DEGs
+mat <- assay(vsd)[top_genes, ]
+mat <- mat - rowMeans(mat)
+
+pheatmap(mat,
+         cluster_rows = TRUE,
+         cluster_cols = TRUE,
+         annotation_col = deseq2.colData,
+         show_rownames = FALSE,
+         fontsize_col = 8,
+         main = "Top 50 Differentially Expressed Genes")
+```
+

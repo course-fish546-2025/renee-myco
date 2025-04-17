@@ -1,0 +1,252 @@
+---
+title: "Local BLAST Implementation and Query Execution"
+author: "Renee Davis"
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
+output: 
+  html_document:
+    theme: readable
+    toc: true
+    toc_float: true
+    number_sections: true
+    code_folding: show
+---
+
+This report documents the installation, verification, and use of a local NCBI BLAST database to query an unknown sequence. For this we will take the following steps:
+
+1.  Make the BLAST database on a high performance university server (Raven),
+
+2.  Obtain a query sequence,
+
+3.  Run BLAST,
+
+4.  Obtain annotations,
+
+5.  Create a table with the results.
+
+# Make BLAST database
+
+## Download NCBI BLAST files
+
+To begin, we will download BLAST files to an applications folder, a sibling folder to our GitHub repository to avoid the file limit constraints.
+
+```{basheval = FALSE}
+cd /home/jovyan/applications #is this a good relative file path? Reproducible?
+curl -O https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/ncbi-blast-2.16.0+-x64-linux.tar.gz
+tar -xf ncbi-blast-2.16.0+-x64-linux.tar.gz
+```
+
+The following code previews the file (header) to help us verify that the above curl commands downloaded the software correctly.
+
+```{bash}
+/home/jovyan/applications/ncbi-blast-2.16.0+/bin/blastx -h #verify installation
+```
+
+## Download UniProtK/Swiss-Pro files
+
+**UniProt** is a universal protein knowledgebase, and **UniProtKB/Swiss-Prot** is its manually annotated and section. These will provide a central resource for protein sequences and similar functional information.
+
+```{bash, eval = FALSE}
+cd ../../blastdb #directs the file downloads into a blastdb folder
+
+curl -O https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/uniprot_sprot.fasta.gz
+
+mv uniprot_sprot.fasta.gz uniprot_sprot_r2025_01.fasta.gz
+
+gunzip -k uniprot_sprot_r2025_01.fasta.gz #unzips the files
+
+ls #shows a list of all files downloaded into this folder
+```
+
+```{bash, eval = FALSE}
+cd ../../blastdb
+head unip* #previews the file and ensures that everything downloaded correctly
+```
+
+An adequate head will look like this:
+
+```         
+==> ../../blastdb/uniprot_sprot_r2025_01.fasta <==
+>sp|Q6GZX4|001R_FRG3G Putative transcription factor 001R OS=Frog virus 3 (isolate Goorha) OX=654924 GN=FV3-001R PE=4 SV=1
+MAFSAEDVLKEYDRRRRMEALLLSLYYPNDRKLLDYKEWSPPRVQVECPKAPVEWNNPPS
+EKGLIVGHFSGIKYKGEKAQASEVDVNKMCCWVSKFKDAMRRYQGIQTCKIPGKVLSDLD
+AKIKAYNLTVEGVEGFVRYSRVTKQHVAAFLKELRHSKQYENVNLIHYILTDKRVDIQHL
+EKDLVKDFKALVESAHRMRQGHMINVKYILYQLLKKHGHGPDGPDILTVKTGSKGVLYDD
+SFRKIYTDLGWKFTPL
+>sp|Q6GZX3|002L_FRG3G Uncharacterized protein 002L OS=Frog virus 3 (isolate Goorha) OX=654924 GN=FV3-002L PE=4 SV=1
+MSIIGATRLQNDKSDTYSAGPCYAGGCSAFTPRGTCGKDWDLGEQTCASGFCTSQPLCAR
+IKKTQVCGLRYSSKGKDPLVSAEWDSRGAPYVRCTYDADLIDTQAQVDQFVSMFGESPSL
+AERYCMRGVKNTAGELVSRVSSDADPAGGWCRKWYSAHRGPDQDAALGSFCIKNPGAADC
+```
+
+Then we create a local BLAST database from a FASTA file of protein sequences.
+
+```{bash, eval = FALSE}
+/home/jovyan/applications/ncbi-blast-2.16.0+/bin/makeblastdb \  # calling the makeblastdb program
+-in ../../blastdb/uniprot_sprot_r2025_01.fasta \  # specifies the input file — in this case, a FASTA file of protein sequences from UniProt
+-dbtype prot \  # tells BLAST to treat the input as protein sequences
+-out ../../blastdb/uniprot_sprot_r2025_01 #defines the base name for the output database files
+```
+
+```         
+Building a new DB, current time: 04/10/2025 10:45:01
+New DB name:   /home/jovyan/blastdb/uniprot_sprot_r2025_01
+New DB title:  ../../blastdb/uniprot_sprot_r2025_01.fasta
+Sequence type: Protein
+Deleted existing Protein BLAST database named /home/jovyan/blastdb/uniprot_sprot_r2025_01
+Keep MBits: T
+Maximum file size: 3000000000B
+Adding sequences from FASTA; added 572970 sequences in 16.0218 seconds.
+```
+
+# Obtain the query sequence
+
+```{bash, eval = FALSE}
+curl https://eagle.fish.washington.edu/cnidarian/Ab_4denovo_CLC6_a.fa \  #grabs an unknown sequence
+-k \
+> ../../blastdb/Ab_4denovo_CLC6_a.fa 
+
+head ../../blastdb/Ab_4denovo_CLC6_a.fa  #quick preview to confirm the download and inspect sequence structure
+echo "How many sequences are there?"
+grep -c ">" ../../blastdb/Ab_4denovo_CLC6_a.fa. #counts the number of sequences in the file
+```
+
+From running this code we are able to confirm 5490 sequences.
+
+# Run BLAST
+
+Now we will take a query, align it to a local BLAST protein database, and find matches. The matches will be filtered and we will get a report of top hits.
+
+```{bash, eval = FALSE}
+../../applications/ncbi-blast-2.16.0+/bin/blastx \  #translates a nucleotide query and aligns it to a protein database
+-query ../../blastdb/Ab_4denovo_CLC6_a.fa \  #points to the FASTA file of the unknown sequence
+-db ../../blastdb/uniprot_sprot_r2025_01 \  #points to the local BLAST protein database from UniProt
+-out ../../output/Ab_4-uniprot_blastx.tab \
+-evalue 1E-20 \  #filters out weak matches, only highly significant alignments will be reported
+-num_threads 20 \ 
+-max_target_seqs 1 \  #reports only the top hit per query sequence
+-outfmt 6
+
+head -2 ../../output/Ab_4-uniprot_blastx.tab  #previews the first 2 hits
+wc -l ../../output/Ab_4-uniprot_blastx.tab  #counts the number of hits in the output file
+```
+
+```         
+Warning: [Query 5476-5490] Examining 5 or more matches is recommended
+Warning: [Query 5476-5490] Number of threads was reduced to 16 to match the number of available CPUs
+solid0078_20110412_FRAG_BC_WHITE_WHITE_F3_QV_SE_trimmed_contig_3    sp|O42248|GBLP_DANRE    82.456  171 30  0   1   513 35  205 2.83e-103   301
+solid0078_20110412_FRAG_BC_WHITE_WHITE_F3_QV_SE_trimmed_contig_5    sp|Q08013|SSRG_RAT  75.385  65  16  0   3   197 121 185 1.41e-28    104
+765 ../../output/Ab_4-uniprot_blastx.tab
+```
+
+We can interpret that there were 765 hits (no. rows in Ab_4-uniprot_blastx.tab).
+
+# Annotations and more information
+
+We will now obtain an annotation table to use with the BLAST output table. The following code downloads and reads a tab-delimited annotation table from UniProt.
+
+```{r}
+spgo <- read.csv("https://gannet.fish.washington.edu/seashell/snaps/uniprot_table_r2023_01.tab", sep = '\t', header = TRUE)
+```
+
+## Joining BLAST with annotation table
+
+Now we will check that the BLAST output file looks ok, and since each row represents a BLAST hit, this tells you how many significant alignments were reported.
+
+```{bash}
+head -2 ../../output/Ab_4-uniprot_blastx.tab
+wc -l ../../output/Ab_4-uniprot_blastx.tab
+```
+
+```         
+solid0078_20110412_FRAG_BC_WHITE_WHITE_F3_QV_SE_trimmed_contig_3    sp|O42248|GBLP_DANRE    82.456  171 30  0   1   513 35  205 2.83e-103   301  
+solid0078_20110412_FRAG_BC_WHITE_WHITE_F3_QV_SE_trimmed_contig_5    sp|Q08013|SSRG_RAT  75.385  65  16  0   3   197 121 185 1.41e-28    104
+81 ../../output/Ab_4-uniprot_blastx.tab
+```
+
+From the last line of the output, we can determine that there were 81 hits in BLAST.
+
+Now we will transform this file into a format that is easier to join with the UniProt annotation table.
+
+```{bash}
+tr '|' '\t' < ../../output/Ab_4-uniprot_blastx.tab | head -2
+```
+
+```{bash}
+tr '|' '\t' < ../../output/Ab_4-uniprot_blastx.tab \
+> ../../output/Ab_4-uniprot_blastx_sep.tab
+ls ../../output
+```
+
+This code created a new file "Ab_4-uniprot_blastx_sep.tab."
+
+```         
+Ab_4-uniprot_blastx.tab
+Ab_4-uniprot_blastx_sep.tab
+```
+
+```{bash}
+head -2 ../../output/Ab_4-uniprot_blastx.tab
+wc -l ../../output/Ab_4-uniprot_blastx.tab
+```
+
+```         
+solid0078_20110412_FRAG_BC_WHITE_WHITE_F3_QV_SE_trimmed_contig_3    sp|O42248|GBLP_DANRE    82.456  171 30  0   1   513 35  205 2.83e-103   301
+solid0078_20110412_FRAG_BC_WHITE_WHITE_F3_QV_SE_trimmed_contig_5    sp|Q08013|SSRG_RAT  75.385  65  16  0   3   197 121 185 1.41e-28    104
+81 ../../output/Ab_4-uniprot_blastx.tab
+```
+
+# Creating a table
+
+First we will load the necessary packages to create a table from the data generated above. Then we will
+
+```{r}
+library(tidyverse)
+library("kableExtra")
+```
+
+Then we will read in the data.
+
+```{r}
+bltabl <- read.csv("../../output/Ab_4-uniprot_blastx_sep.tab", sep = '\t', header = FALSE)
+```
+
+```{r echo=TRUE}
+kbl(
+head(
+  left_join(bltabl, spgo,  by = c("V3" = "Entry")) %>%
+  select(V1, V3, V13, Protein.names, Organism, Gene.Ontology..biological.process., Gene.Ontology.IDs) %>% mutate(V1 = str_replace_all(V1, 
+            pattern = "solid0078_20110412_FRAG_BC_WHITE_WHITE_F3_QV_SE_trimmed", replacement = "Ab"))
+)
+) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+left_join(bltabl, spgo,  by = c("V3" = "Entry")) %>%
+  select(V1, V3, V13, Protein.names, Organism, Gene.Ontology..biological.process., Gene.Ontology.IDs) %>% mutate(V1 = str_replace_all(V1, 
+            pattern = "solid0078_20110412_FRAG_BC_WHITE_WHITE_F3_QV_SE_trimmed", replacement = "Ab")) %>%
+  write_delim("../../output/blast_annot_go.tab", delim = '\t')
+```
+
+This table displays key information that will aid in further downstream interpretation of the BLAST run: organism,
+
+# Species hits
+
+```{r}
+left_join(bltabl, spgo, by = c("V3" = "Entry")) %>%
+  count(Organism, sort = TRUE) %>%
+  top_n(10) %>%
+  ggplot(aes(x = reorder(Organism, n), y = n, fill = Organism)) +
+  geom_col(show.legend = FALSE) +
+  coord_flip() +
+  labs(title = "Top 10 Organisms in BLAST Hits", x = "Organism", y = "Number of Hits") +
+  theme_minimal()
+```
+
+This chart pulls information from the organism column in the previous table to display the top 10 organisms in the BLAST hits.
+
+# Further reading
+
+[FISH 546 course tutorial/walkthrough](https://sr320.github.io/course-fish546-2025/assignments/01-blast.html)
+
+[NCBI: Download BLAST Software and Databases](https://blast.ncbi.nlm.nih.gov/doc/blast-help/downloadblastdata.html#downloadblastdata)
+
+[SMBE regional workshop on running local BLAST and parsing output](https://dbsloan.github.io/TS2019/exercises/local_blast.html)
