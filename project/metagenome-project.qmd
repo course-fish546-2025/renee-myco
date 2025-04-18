@@ -1,0 +1,299 @@
+---
+title: "Rhizospheric fungal/bacteria metagenome project"
+format: html
+editor: 
+  markdown: 
+    wrap: sentence
+---
+
+# Data upload
+
+The goal for week 2 is to upload fastq files to Raven server.
+Note that this needs to be done from the local terminal, not the one on the server.
+
+```{bash}
+# move files from lab drive to Raven
+scp "/Volumes/CRUZER16GB/F1B-KM40_R1_001.fastq.gz" \
+rendavis@raven.fish.washington.edu:/home/shared/16TB_HDD_01/fish546/renee/
+```
+
+That was successful.
+Now we upload the rest using rsync instead (better for handling multiple files, fewer chances of duplicates, conflicts etc).
+
+```{bash}
+# move remaining files from lab drive to Raven
+rsync -av --progress \
+    /Volumes/CRUZER16GB/*.fastq.gz \
+    rendavis@raven.fish.washington.edu:/home/shared/16TB_HDD_01/fish546/renee/
+```
+
+# Data integrity and quality control
+
+## Checksums
+
+Before we begin working, let's run a MD5 check on the 4 metagenome fastq files.
+
+```{bash}
+find . -type f -exec md5sum-lite {} \; >> output.txt  #found all files in the working directory, calculated its MD5 checksum, save to an output txt file
+```
+
+This prints the results to a text file.
+Here is the output:
+
+```         
+b24ae50750964ef8d01a8808051c73c7  ./F2R-KM41_R2_001.fastq.gz
+a48a5ad0bc4ce07f641c0c647fe0dbaf  ./F1B-KM40_R2_001.fastq.gz
+88d5e83290598639d54218bc505bfe66  ./output.txt
+a8be224ab035ea641ccd5a8c9d46c024  ./F2R-KM41_R1_001.fastq.gz
+e34585c824e429f54ff34d919719f1c4  ./F1B-KM40_R1_001.fastq.gz
+```
+
+```{bash}
+mv output.txt md5checksums_metagenomes_2025.txt #renamed the file to something more descriptive
+```
+
+To validate file integrity later, you could run the following code to ensure a match.
+
+```{bash}
+md5sum -c md5checksums_metagenomes_2025.txt
+```
+
+## Quality control
+
+### FastQC
+
+I have been told that QC has been run on these, but we won't take that at face value.
+For this we will use FastQC.
+
+```{bash}
+# run FastQC on the fastq files
+/home/shared/FastQC-0.12.1/fastqc -t 36 -o output /home/shared/16TB_HDD_01/fish546/renee/*.fastq.gz
+```
+
+```{bash}
+Analysis complete for F2R-KM41_R1_001.fastq.gz
+Analysis complete for F2R-KM41_R2_001.fastq.gz
+Analysis complete for F1B-KM40_R1_001.fastq.gz
+Analysis complete for F1B-KM40_R2_001.fastq.gz
+```
+
+.png files downloaded to my desktop.
+
+### MultiQC
+
+```{bash echo=TRUE}
+eval "$(/opt/anaconda/anaconda3/bin/conda shell.bash hook)"
+conda activate
+which multiqc
+
+cd output
+
+multiqc .
+```
+
+See html report in output folder.
+
+# Preprocessing
+
+We have to preprocess raw data to enable clean, high-quality reads ready for assembly.
+This involves 2 steps: trimming and merging forward and reverse reads.
+
+## Trimming using Trimmomatic
+
+We need to trim raw data to remove adapters and low-quality bases.
+It's important to do this prior to merging, as merging reads relies on the overlapping region between forward and reverse reads.
+If you try to merge before trimming, you could end up with incorrect overlaps, low quality merges, and related issues.
+
+For this step we will use [Trimmomatic](#0), which we will have to install manually.
+
+```{bash}
+scp -r ~/Downloads/Trimmomatic-0.39 rendavis@raven.fish.washington.edu:/home/shared/16TB_HDD_01/fish546/renee  #from the local terminal
+```
+
+Now we will run it to trim adapters and low quality bases.
+We'll stick with defaults of greater than or equal to 50 base pairs (bp), and 3 leading and trailing bp.
+We will do this in 2 steps with F1B R1/R2 and then F2R R1/R2.
+
+```{bash}
+cd /home/shared/16TB_HDD_01/fish546/renee
+java -jar /home/shared/16TB_HDD_01/fish546/renee/Trimmomatic-0.39/trimmomatic-0.39.jar PE -threads 4 \
+  F1B-KM40_R1_001.fastq.gz F1B-KM40_R2_001.fastq.gz \
+  F1B-KM40_trimmed_R1_paired.fastq.gz F1B-KM40_trimmed_R1_unpaired.fastq.gz \
+  F1B-KM40_trimmed_R2_paired.fastq.gz F1B-KM40_trimmed_R2_unpaired.fastq.gz \
+  ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 \
+  LEADING:3 TRAILING:3 SLIDINGWINDOW:4:20 MINLEN:50  #keeps bps equal or above 50 
+```
+
+```         
+Quality encoding detected as phred33
+Input Read Pairs: 31944124 
+Both Surviving: 29010263 (90.82%) 
+Forward Only Surviving: 1518244 (4.75%) 
+Reverse Only Surviving: 921543 (2.88%) 
+Dropped: 494074 (1.55%)
+TrimmomaticPE: Completed successfully
+```
+
+These are good numbers.
+Generally, anything over 80% both surviving is considered good.
+And 1.5% is a very low drop rate.
+
+```{bash}
+cd /home/shared/16TB_HDD_01/fish546/renee/raw-data  
+java -jar /home/shared/16TB_HDD_01/fish546/renee/Trimmomatic-0.39/trimmomatic-0.39.jar PE -threads 4 \
+  F2R-KM41_R1_001.fastq.gz F2R-KM41_R2_001.fastq.gz \
+  F2R-KM41_trimmed_R1_paired.fastq.gz F2R-KM41_trimmed_R1_unpaired.fastq.gz \
+  F2R-KM41_trimmed_R2_paired.fastq.gz F2R-KM41_trimmed_R2_unpaired.fastq.gz \
+  ILLUMINACLIP:/home/shared/16TB_HDD_01/fish546/renee/Trimmomatic-0.39/adapters/TruSeq3-PE.fa:2:30:10  #had to use the whole file path here
+  LEADING:3 TRAILING:3 SLIDINGWINDOW:4:20 MINLEN:50  #keeps bps equal or above 50 
+```
+
+```         
+Quality encoding detected as phred33
+Input Read Pairs: 27015389 
+Both Surviving: 26807327 (99.23%) 
+Forward Only Surviving: 208057 (0.77%) 
+Reverse Only Surviving: 0 (0.00%) 
+Dropped: 5 (0.00%)
+TrimmomaticPE: Completed successfully
+```
+
+Trimmomatic produces **unpaired** and **paired** file outputs.
+Paired reads are those which both forward and reverse survived trimming.
+Unpaired reads indicate where only one of the pair survived (the other was discarded due to low quality or short length).
+
+We will use the paired files for most downstream steps like merging and assembly, but will keep the unpaired files around just in case we need to embark on deeper analysis.
+
+## Merging forward and reverse reads using PEAR
+
+These are R1/R2 (forward and reverse reads) and will have to be merged.
+This is the last component of pre-processing as we work towards metagenome assembly.For this we will use fastp which is already installed on Raven.
+
+```{bash}
+cd /home/shared/16TB_HDD_01/fish546/renee
+
+# Merge F1B-KM40
+/home/shared/fastp-v0.24.0/fastp \
+  -i F1B-KM40_trimmed_R1_paired.fastq.gz \
+  -I F1B-KM40_trimmed_R2_paired.fastq.gz \
+  --merge \
+  --merged_out F1B-KM40_merged.fastq.gz \
+  
+# Merge F2R-KM41
+/home/shared/fastp-v0.24.0/fastp \
+  -i F2R-KM41_trimmed_R1_paired.fastq.gz \
+  -I F2R-KM41_trimmed_R2_paired.fastq.gz \
+  --merge \
+  --merged_out F2R-KM41_merged.fastq.gz \
+```
+
+```         
+Read1 before filtering:
+total reads: 29010263
+total bases: 4140614008
+Q20 bases: 4050447746(97.8224%)
+Q30 bases: 3845738339(92.8785%)
+
+Read2 before filtering:
+total reads: 29010263
+total bases: 4154017583
+Q20 bases: 4065704832(97.874%)
+Q30 bases: 3866115895(93.0693%)
+
+Merged and filtered:
+total reads: 7474936
+total bases: 1650421008
+Q20 bases: 1630687369(98.8043%)
+Q30 bases: 1578354375(95.6334%)
+
+Filtering result:
+reads passed filter: 58018466
+reads failed due to low quality: 0
+reads failed due to too many N: 2060
+reads failed due to too short: 0
+reads with adapter trimmed: 635320
+bases trimmed due to adapters: 11744183
+reads corrected by overlap analysis: 2160886
+bases corrected by overlap analysis: 2804599
+
+Duplication rate: 7.13807%
+
+Insert size peak (evaluated by paired-end reads): 268
+
+Read pairs merged: 7474936
+% of original read pairs: 25.7665%
+% in reads after filtering: 100%
+
+
+JSON report: fastp.json
+HTML report: fastp.html
+
+/home/shared/fastp-v0.24.0/fastp -i F1B-KM40_trimmed_R1_paired.fastq.gz -I F1B-KM40_trimmed_R2_paired.fastq.gz --merge --merged_out F1B-KM40_merged.fastq.gz 
+fastp v0.24.0, time used: 178 seconds
+Read1 before filtering:
+total reads: 26807327
+total bases: 4021099050
+Q20 bases: 3808188117(94.7052%)
+Q30 bases: 3500492825(87.0531%)
+
+Read2 before filtering:
+total reads: 26807327
+total bases: 4021099050
+Q20 bases: 3793251312(94.3337%)
+Q30 bases: 3477357474(86.4778%)
+
+Merged and filtered:
+total reads: 6724249
+total bases: 1525795473
+Q20 bases: 1489384743(97.6137%)
+Q30 bases: 1418180834(92.947%)
+
+Filtering result:
+reads passed filter: 51640358
+reads failed due to low quality: 1969720
+reads failed due to too many N: 4576
+reads failed due to too short: 0
+reads with adapter trimmed: 170138
+bases trimmed due to adapters: 2613154
+reads corrected by overlap analysis: 2552667
+bases corrected by overlap analysis: 5056209
+
+Duplication rate: 6.67899%
+
+Insert size peak (evaluated by paired-end reads): 268
+
+Read pairs merged: 6724249
+% of original read pairs: 25.0836%
+% in reads after filtering: 100%
+```
+
+Around 25% of original read pairs got merged, which appears to be typical for paired-end read merging.
+
+As a final step, we'll preview the file and do a quality check on the merged files using FastQC.
+
+```{bash}
+# run FastQC on the fastq files
+/home/shared/FastQC-0.12.1/fastqc -t 36 -o output /home/shared/16TB_HDD_01/fish546/renee/*merged.fastq.gz
+```
+
+HTML report results: [F1B-KM40_merged.fastq.gz](http://raven.fish.washington.edu:8787/files/renee-myco/project/output/F1B-KM40_merged_fastqc.html); [F2R-KM41_merged.fastq.gz](http://raven.fish.washington.edu:8787/files/renee-myco/project/output/F2R-KM41_merged_fastqc.html).
+F1B has higher per base sequence quality, but both look good.
+
+# Next steps (week 4-9)
+
+1.  verify that current code is reproducible (I think I have some problems here)
+
+2.  begin **assembly** of metagenome contigs
+
+3.  marker gene extraction - identify 16S (bacteria) and ITS (fungi) reads
+
+4.  taxonomic classification
+
+5.  visualizations
+
+# References
+
+Bolger, A. M., Lohse, M., & Usadel, B.(2014). Trimmomatic: A flexible trimmer for Illumina Sequence Data.
+Bioinformatics, btu170.
+
+Zhang J, Kobert K, Flouri T, Stamatakis A. PEAR: A fast and accurate Illimuna Paired-End reAd mergeR.

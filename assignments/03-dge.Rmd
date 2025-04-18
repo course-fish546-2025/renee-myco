@@ -170,7 +170,7 @@ dim(deseq2.res[!is.na(deseq2.res$padj) & deseq2.res$padj <= 0.05, ])
 
 We have 607 significantly differentially expressed genes, based on padj \<= 0.05. There are 6 columns of data for each.
 
-# Creating a plot
+# Volcano plot of DEGs
 
 ```{r}
 tmp <- deseq2.res

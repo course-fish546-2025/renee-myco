@@ -11,7 +11,7 @@
 
 <meta name="author" content="Renee Davis" />
 
-<meta name="date" content="2025-04-16" />
+<meta name="date" content="2025-04-17" />
 
 <title>RNA Sequencing and Differential Gene Expression</title>
 
@@ -1582,7 +1582,7 @@ border-radius: 0px;
 <h1 class="title toc-ignore">RNA Sequencing and Differential Gene
 Expression</h1>
 <h4 class="author">Renee Davis</h4>
-<h4 class="date">April 16, 2025</h4>
+<h4 class="date">April 17, 2025</h4>
 
 </div>
 
@@ -1779,8 +1779,9 @@ dim(deseq2.res[!is.na(deseq2.res$padj) &amp; deseq2.res$padj &lt;= 0.05, ])</cod
 <p>We have 607 significantly differentially expressed genes, based on
 padj &lt;= 0.05. There are 6 columns of data for each.</p>
 </div>
-<div id="creating-a-plot" class="section level1" number="6">
-<h1><span class="header-section-number">6</span> Creating a plot</h1>
+<div id="volcano-plot-of-degs" class="section level1" number="6">
+<h1><span class="header-section-number">6</span> Volcano plot of
+DEGs</h1>
 <pre class="r"><code>tmp &lt;- deseq2.res
 
 # The main plot
