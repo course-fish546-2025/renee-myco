@@ -9,7 +9,7 @@ tmux is a terminal multiplexer. They allow a session with multiple windows, each
 # What is ssh and what would the code be you would type if you were going to ssh into raven?
 SSH stands for secure shell, and allows for secure remote login and file access.
 
-The code for accessing Raven would be ssh raven.fish.washington.edu
+The code for accessing Raven would be ssh rendavis@raven.fish.washington.edu
 
 # What has been the most challenging part of your research project? Are you happy with your organization skills? If not what could be improved?
 One of the things I did last week was create some subdirectories to organize the intermediate files. I'm happy with the result; my project folder isn't giving me anxiety. But let me know if you see any issues here. 
