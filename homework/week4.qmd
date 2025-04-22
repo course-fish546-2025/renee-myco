@@ -1,0 +1,20 @@
+---
+title: "week4"
+format: html
+---
+
+# What is tmux and how does this relate to our current way of working on raven?
+tmux is a terminal multiplexer. They allow a session with multiple windows, each running their own processes. They can allow a session to persist if the terminal window is closed or quit. All sessions can be reattached to whatever terminal you’re currently on.
+
+# What is ssh and what would the code be you would type if you were going to ssh into raven?
+SSH stands for secure shell, and allows for secure remote login and file access.
+
+The code for accessing Raven would be ssh raven.fish.washington.edu
+
+# What has been the most challenging part of your research project? Are you happy with your organization skills? If not what could be improved?
+One of the things I did last week was create some subdirectories to organize the intermediate files. I'm happy with the result; my project folder isn't giving me anxiety. But let me know if you see any issues here. 
+
+The most challenging part has been getting back into a genomics headspace, and actually interpreting the outputs of various code runs. It's just a steep learning curve. Next up for me is assembly, and I'm intimidated by it. 
+
+# For last weeks assignment what did you appreciate the most about knitting documents?
+It's nice to have the final result - a really nice looking, clean document. But the code evaluations from the knit can be hard to deal with - code works when I'm working through the document, but there are problems when knitting. 
