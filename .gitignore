@@ -7,4 +7,6 @@
 # Ignore large files
 assignments/data/*
 assignments/output/*
+project/megahit/*
+project/build/*
 rna.fna

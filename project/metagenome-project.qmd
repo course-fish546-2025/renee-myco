@@ -6,6 +6,12 @@ editor:
     wrap: sentence
 ---
 
+We are analyzing the metagenomes from 2 soil samples from a greenhouse study.
+These will give us a sense of resident microbial (fungal and bacteiral) communities prior to biofertilizer treatment.
+
+1.  F1B-KM40 - bulk field soil
+2.  F2\$-KM41 - rhizosphere soil
+
 # Data upload
 
 The goal for week 2 is to upload fastq files to Raven server.
@@ -279,21 +285,113 @@ As a final step, we'll preview the file and do a quality check on the merged fil
 HTML report results: [F1B-KM40_merged.fastq.gz](http://raven.fish.washington.edu:8787/files/renee-myco/project/output/F1B-KM40_merged_fastqc.html); [F2R-KM41_merged.fastq.gz](http://raven.fish.washington.edu:8787/files/renee-myco/project/output/F2R-KM41_merged_fastqc.html).
 F1B has higher per base sequence quality, but both look good.
 
-# Next steps (week 4-9)
+# Assembly using MEGAHIT
 
-1.  verify that current code is reproducible (I think I have some problems here)
+## Installation
 
-2.  begin **assembly** of metagenome contigs
+First we clone the repository into our working folder.
 
-3.  marker gene extraction - identify 16S (bacteria) and ITS (fungi) reads
+```{bash}
+cd /home/shared/16TB_HDD_01/fish546/renee/
+git clone https://github.com/voutcn/megahit.git #this brings the installation files into our working directory
+cd megahit #navigating to the folder
+```
 
-4.  taxonomic classification
+Then we have to compile MEGAHIT.
 
-5.  visualizations
+```{bash}
+cd /home/shared/16TB_HDD_01/fish546/renee/
+mkdir build
+cd build
+cmake ../megahit
+make
+
+./megahit --version # tests the installation; MEGAHIT v1.2.9
+```
+
+## Assembly process
+
+Once this is done, we run each file independently to produce two assemblies.
+
+```{bash}
+cd /home/shared/16TB_HDD_01/fish546/renee/build  #pointing wd to the binary files
+./megahit -r ../F1B-KM40_merged.fastq.gz  #specifying input file
+-o megahit_F1B_KM40_out   #output directory
+--min-contig-len 500  #over 500 bps
+-t 8  #8 threads
+```
+
+```{bash}
+cd /home/shared/16TB_HDD_01/fish546/renee/build
+
+./megahit \
+  -r ../F2R-KM41_merged.fastq.gz \
+  -o megahit_F2R_KM41_out \
+  --min-contig-len 500 \
+  -t 8
+```
+
+Each run took 120 minutes.
+
+## Check files
+
+We want to see a text file when we check files using the head command.
+
+```{bash}
+#check F1B_KM40
+cd /home/shared/16TB_HDD_01/fish546/renee/build/megahit_F1B_KM40_out
+head final.contigs.fa
+```
+
+```{bash}
+#checkF2R_KM41
+cd /home/shared/16TB_HDD_01/fish546/renee/build/megahit_F2R_KM41_out
+head final.contigs.fa
+```
+
+We should get something that looks like this:
+
+```         
+>k141_8240 flag=1 multi=2.0000 len=511
+GGGGAACGCGCGCGGACGCGGGAAGGCCGCCTTCAGGTCGAAC
+```
+
+`>` = start of a header.For the meta data: k141 refers to the k-mer size (k=141) used when assembling that contig. 8240 is the ID or serial number assigned to that contig. It's the name of the contig. Then there is the internal MEGAHIT flag for the contig, usually about whether the contig is trusted/high-confidence (flag=1 usually means it's "normal" and usable). Then there is the multiplicity (or coverage estimate), which refers to how many times this contig appeared in the assembly graph. Finally, we have the contig length. 
+
+# Annotation using MG-RAST
+
+MG-RAST (metagenomics Rapid Annotation using Subsystem Technology) is an open source, browser based annotation tool that has been previously been used in Winkler lab bioinformatics projects.
+There is a [user manual]((metagenomics%20Rapid%20Annotation%20using%20Subsystem%20Technology)).
+
+# Next steps (week 5-9)
+
+1.  marker gene extraction - identify 16S (bacteria) and ITS (fungi) reads (OR annotation?)
+
+2.  taxonomic classification
+
+3.  visualizations
 
 # References
 
 Bolger, A. M., Lohse, M., & Usadel, B.(2014). Trimmomatic: A flexible trimmer for Illumina Sequence Data.
 Bioinformatics, btu170.
 
+F. Meyer, D. Paarmann, M. D'Souza, R. Olson , E.
+M. Glass, M. Kubal, T. Paczian, A. Rodriguez, R. Stevens, A. Wilke, J. Wilkening, and R.
+A. Edwards.
+The Metagenomics RAST server --- A public resource for the automatic phylogenetic and functional analysis of metagenomes.
+BMC Bioinformatics 2008, 9:386.
+[http://www.biomedcentral.com/1471-2105/ 9/386](http://www.biomedcentral.com/1471-2105/9/386)
+
+Thomas T, Gilbert J, Meyer F. Metagenomics - a guide from sampling to data analysis.
+Microb Inform Exp. 2012 Feb 9;2(1):3.
+doi: 10.1186/2042-5783-2-3.
+PMID: 22587947; PMCID: PMC3351745.
+
 Zhang J, Kobert K, Flouri T, Stamatakis A. PEAR: A fast and accurate Illimuna Paired-End reAd mergeR.
+
+Vollmers J, Wiegand S, Kaster AK. Comparing and Evaluating Metagenome Assembly Tools from a Microbiologist's Perspective - Not Only Size Matters!
+PLoS One.
+2017 Jan 18;12(1):e0169662.
+doi: 10.1371/journal.pone.0169662.
+PMID: 28099457; PMCID: PMC5242441.
