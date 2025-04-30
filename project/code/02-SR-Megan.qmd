@@ -1,0 +1,28 @@
+---
+title: "02-SR-Megan"
+format: html
+editor: visual
+---
+
+Read files
+
+```{bash}
+ls /home/shared/16TB_HDD_01/fish546/renee/
+```
+
+
+DIamomd
+
+```{bash}
+    /home/shared/diamond-2.1.8 blastx \
+    --db /home/shared/16TB_HDD_01/sam/databases/blastdbs/ncbi-nr-20250429.dmnd \
+    --query /home/shared/16TB_HDD_01/fish546/renee/F2R-KM41_merged.fastq.gz \
+    --out ../output/sr-blastx.meganized.daa \
+    --outfmt 100 \
+    --top 5 \
+    --block-size 15.0 \
+    --index-chunks 4 \
+    --threads 32
+```
+
+

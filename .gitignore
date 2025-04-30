@@ -10,3 +10,5 @@ assignments/output/*
 project/megahit/*
 project/build/*
 rna.fna
+
+data/*fast*
