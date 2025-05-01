@@ -1,0 +1,120 @@
+---
+title: "05-alignment"
+format: html
+editor: visual
+---
+
+# Task 1: tview
+
+## Download alignment data
+
+```{r, engine='bash'}
+cd ../data
+curl -O https://gannet.fish.washington.edu/seashell/bu-mox/scrubbed/120321-cvBS/19F_R1_val_1_bismark_bt2_pe.deduplicated.sorted.bam
+curl -O https://gannet.fish.washington.edu/seashell/bu-mox/scrubbed/120321-cvBS/19F_R1_val_1_bismark_bt2_pe.deduplicated.sorted.bam.bai
+```
+
+```{r, engine='bash'}
+cd ../data
+curl -O https://gannet.fish.washington.edu/seashell/bu-mox/data/Cvirg-genome/GCF_002022765.2_C_virginica-3.0_genomic.fa
+curl -O https://gannet.fish.washington.edu/seashell/bu-mox/data/Cvirg-genome/GCF_002022765.2_C_virginica-3.0_genomic.fa.fai
+```
+
+## Visualize with tview
+
+Run this in terminal:
+
+```{r, engine='bash'}
+/home/shared/samtools-1.12/samtools tview \
+../data/19F_R1_val_1_bismark_bt2_pe.deduplicated.sorted.bam \
+../data/GCF_002022765.2_C_virginica-3.0_genomic.fa
+```
+
+![](tview%20screenshot.png)
+
+# Task 2 - Aligning WGS data and visualizing in IGV
+
+Downloading the fastq files:
+
+```{r, engine='bash'}
+cd ../data
+curl -O https://owl.fish.washington.edu/nightingales/C_gigas/F143n08_R2_001.fastq.gz
+curl -O https://owl.fish.washington.edu/nightingales/C_gigas/F143n08_R1_001.fastq.gz
+```
+
+```{r, engine='bash'}
+cd ../data
+curl -O https://gannet.fish.washington.edu/panopea/Cg-roslin/cgigas_uk_roslin_v1_genomic-mito.fa
+curl -O https://gannet.fish.washington.edu/panopea/Cg-roslin/cgigas_uk_roslin_v1_genomic-mito.fa.fai
+curl -O https://gannet.fish.washington.edu/panopea/Cg-roslin/GCF_902806645.1_cgigas_uk_roslin_v1_genomic-mito.gtf
+```
+
+## Alignment
+
+We'll use hisat to create a sam file. First we'll call on hisat and make an index file.
+
+```{r, engine='bash'}
+/home/shared/hisat2-2.2.1/hisat2-build \
+-f data/cgigas_uk_roslin_v1_genomic-mito.fa \
+output/cgigas_uk_roslin_v1_genomic-mito.index
+```
+
+Then we'll bring in an index file, as well as forward/reverse (R1/R2 reads) to make the sam file.
+
+```{r, engine='bash'}
+/home/shared/hisat2-2.2.1/hisat2 \
+-x output/cgigas_uk_roslin_v1_genomic-mito.index \
+-p 4 \
+-1 data/F143n08_R1_001.fastq.gz \
+-2 data/F143n08_R2_001.fastq.gz \
+-S output/F143_cgigas.sam
+```
+
+## mpileup
+
+This produces "pileup" textual format from an alignment. Each input file produces a separate group of pileup columns in the output. More information is available [here](https://www.htslib.org/doc/samtools-mpileup.html).
+
+```{r, engine='bash'}
+/home/shared/bcftools-1.14/bcftools mpileup --threads 4 --no-BAQ \
+--fasta-ref data/cgigas_uk_roslin_v1_genomic-mito.fa \
+output/F143_cgigas.sam > output/F143_mpileup_output.txt
+```
+
+This command prints "The input is not sorted (chromosomes out of order)". That sounds OK.
+
+```{r, engine='bash'}
+tail output/F143_mpileup_output.txt
+```
+
+Checking the file tail.
+
+```         
+NC_047560.1 40552325    .   T   <*> 0   .   DP=2;I16=1,0,0,0,60,3600,0,0,60,3600,0,0,25,625,0,0;QS=1,0;FS=0;MQ0F=0  PL  0,3,60
+```
+
+That looks like where we want to be. We're looking for tab-delimited formats.
+
+```{r, engine='bash'}
+cat output/F143_mpileup_output.txt \  #concatonate previous mpileup output
+| /home/shared/bcftools-1.14/bcftools call -mv -Oz \
+> output/F143_mpile.vcf.gz  # output variation call format
+```
+
+Now we use zgrep to search out expressions in the vcf file.
+
+```{r, engine='bash'}
+zgrep "^##" -v output/F143_mpile.vcf.gz | \
+awk 'BEGIN{OFS="\t"} {split($8, a, ";"); print $1,$2,$4,$5,$6,a[1],$9,$10}' | head
+```
+
+We get something like `#CHROM POS REF ALT QUAL INFO FORMAT output/F143_cgigas.sam`.
+
+## Visualization
+
+I downloaded F143_mpile.vcf.gz to my desktop (small file) and imported it to a desktop version of IGV. Here are some screenshots. We left the reference as the default human (GRCh38/hg38).
+
+![This is the first view, showing all chromosomes.](output/IGV%20all.png)
+
+![Checking out chromosome 1.](output/IGV%20chr%201.png)
+
+![Experimented with some of the controls and view functions. Here we are using the slider to hop around the chromosome and check things out.](output/IGV%20chr1%202.png)

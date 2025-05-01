@@ -7,10 +7,10 @@ editor:
 ---
 
 We are analyzing the metagenomes from 2 soil samples from a greenhouse study.
-These will give us a sense of resident microbial (fungal and bacteiral) communities prior to biofertilizer treatment.
+These will give us a sense of resident microbial (fungal and bacterial) communities prior to biofertilizer treatment.
 
 1.  F1B-KM40 - bulk field soil
-2.  F2\$-KM41 - rhizosphere soil
+2.  F2R-KM41 - rhizosphere soil
 
 # Data upload
 
