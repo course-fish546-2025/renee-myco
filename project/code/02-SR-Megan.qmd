@@ -26,3 +26,11 @@ DIamomd
 ```
 
 
+```{bash}
+    /home/shared/megan-6.24.20/tools/daa-meganizer \
+    --in ../output/sr-blastx.meganized.daa \
+    --threads 12 \
+    --mapDB ${megan_mapdb}
+```
+
+
