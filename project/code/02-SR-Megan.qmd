@@ -10,7 +10,6 @@ Read files
 ls /home/shared/16TB_HDD_01/fish546/renee/
 ```
 
-
 DIamomd
 
 ```{bash}
@@ -25,19 +24,24 @@ DIamomd
     --threads 32
 ```
 
-
 ```{bash}
     /home/shared/megan-6.24.20/tools/daa-meganizer \
-    --in ../output/sr-blastx.meganized.daa \
-    --threads 12 \
+    --in ../output/sr-blastx.daa \
+    --threads 32 \
     --mapDB ../data/megan-map-Feb2022.db
 ```
 
-
+```{bash}
 /home/shared/megan-6.24.20/tools/daa2rma \
---in ./PSC-0519_unmapped_reads.1.blastx.meganized.daa ./PSC-0519_unmapped_reads.2.blastx.meganized.daa \
---mapDB ~/data/databases/MEGAN/megan-map-Feb2022.db \
---out ./PSC-0519_unmapped_reads.1.blastx.meganized.rma6 ./PSC-0519_unmapped_reads.2.blastx.meganized.rma6 \
---threads 40 2>&1 | tee --append daa2rma_log.txt
+--in ../output/sr-blastx.daa \
+--mapDB ../data/megan-map-Feb2022.db \
+--out ../output/sr-blastx-meganized.rma6 \
+--threads 40 2>&1 | tee --append ../output/daa2rma_log.txt
 
+```
 
+Open MEGAN on locally and looked at rda file
+
+pdf: http://gannet.fish.washington.edu/seashell/snaps/sr-blastx-meganized.pdf
+
+![](http://gannet.fish.washington.edu/seashell/snaps/sr-blastx-meganized.png)
