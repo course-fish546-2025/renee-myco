@@ -17,7 +17,7 @@ DIamomd
     /home/shared/diamond-2.1.8 blastx \
     --db /home/shared/16TB_HDD_01/sam/databases/blastdbs/ncbi-nr-20250429.dmnd \
     --query /home/shared/16TB_HDD_01/fish546/renee/F2R-KM41_merged.fastq.gz \
-    --out ../output/sr-blastx.meganized.daa \
+    --out ../output/sr-blastx.daa \
     --outfmt 100 \
     --top 5 \
     --block-size 15.0 \
@@ -30,7 +30,14 @@ DIamomd
     /home/shared/megan-6.24.20/tools/daa-meganizer \
     --in ../output/sr-blastx.meganized.daa \
     --threads 12 \
-    --mapDB ${megan_mapdb}
+    --mapDB ../data/megan-map-Feb2022.db
 ```
+
+
+/home/shared/megan-6.24.20/tools/daa2rma \
+--in ./PSC-0519_unmapped_reads.1.blastx.meganized.daa ./PSC-0519_unmapped_reads.2.blastx.meganized.daa \
+--mapDB ~/data/databases/MEGAN/megan-map-Feb2022.db \
+--out ./PSC-0519_unmapped_reads.1.blastx.meganized.rma6 ./PSC-0519_unmapped_reads.2.blastx.meganized.rma6 \
+--threads 40 2>&1 | tee --append daa2rma_log.txt
 
 
