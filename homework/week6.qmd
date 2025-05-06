@@ -1,0 +1,38 @@
+---
+title: "week6"
+format: html
+---
+
+# What is Quarto?
+
+Quarto is an open source technical publishing system. It can be used to generate documents and presentations. We've been using simple Quarto documents so far in this class. Now we will step up use of different formats, features, and tools with Quarto presentations this week.
+
+# How do you make columns using Revealjs in Quarto Presentations?
+
+To make columns, you can use a native div container with class .columns, containing two or more div containers with class .column and a width attribute:
+
+```         
+::::: columns
+
+::: {.column width="40%"}
+Left column
+:::
+
+::: {.column width="60%"}
+Right column
+:::
+
+:::::
+```
+
+# How would you change the appearance of slides using Revealjs in Quarto Presentations?
+
+You can specify a certain theme (there are 11 built in) in the YAML header, e.g. theme: dark. You can also include a logo, footer, background (color/gradient/image/videos!) by configuring different attributes in the header.
+
+# What has been the biggest constraint working on your own research project in the past week?
+
+MG-RAST download and use requires an account, which is approved by project admin on an apparently irregular schedule. I don't have access to this yet, but was planning on using this for annotation. So I'll arrange a plan B.
+
+I have a larger workflow question regarding annotation. Should I prioritize marker gene extraction, with the purpose of identifying 16S (bacteria) and ITS (fungi) reads? Or can I extract this easily after I annotate?
+
+Otherwise, I've exceeded my own personal expectations on the project (I can't believe I'm actually doing bioinformatic things), so I am just stoked. I can't wait for taxonomic classifications and visualizations.
