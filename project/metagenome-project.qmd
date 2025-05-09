@@ -170,10 +170,10 @@ Unpaired reads indicate where only one of the pair survived (the other was disca
 
 We will use the paired files for most downstream steps like merging and assembly, but will keep the unpaired files around just in case we need to embark on deeper analysis.
 
-## Merging forward and reverse reads using PEAR
+## Merging forward and reverse reads using fastp
 
 These are R1/R2 (forward and reverse reads) and will have to be merged.
-This is the last component of pre-processing as we work towards metagenome assembly.For this we will use fastp which is already installed on Raven.
+This is the last component of pre-processing as we work towards metagenome assembly. For this we will use fastp which is already installed on Raven.
 
 ```{bash}
 cd /home/shared/16TB_HDD_01/fish546/renee
