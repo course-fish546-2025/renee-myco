@@ -1,0 +1,30 @@
+---
+title: "week7"
+format: html
+---
+
+# What is your current grade in the class? How many issues are open in our research repository?
+
+It looks like I have \>95% from the spreadsheet. I have 1 open issue relating to the embedded visualization in my slide deck. (Will address it tonight.)
+
+# Re-reading this week’s reading, what are 2 things that resonate with you now that made little practical sense in week 2. What is one aspect that you still wonder about or is unclear?
+
+It's really great to reread this. Things that make more sense now include: 1. exactly what a contig is and how it relates to assembly, and 2. alignment and sequence read mapping now makes more sense. SAM and BAM files are nothing to be afraid of.
+
+In terms of something I wonder about: heat maps. I can understand them in literature, but have never generated them or used them in a research project. I also could use more practice understanding and interpreting volcano plots. They still seem really esoteric to me.
+
+# What is epigenetics and how could it relate to your own research project?
+
+Epigenetics refers to different mechanisms (DNA methylation, histone modifications, and noncoding RNAs) that alter genetic expression without actually changing the nucleotides. They are sensitive and responsive to environmental changes.
+
+In terms of my project, which concerns bacterial/fungal/plant symbioses, DNA methylation and histone post-translational modifications actually shape the plant root system response and allow the successful establishment of both N-fixing bacteria and arbuscular mycorrhiza fungi ([ref](https://academic.oup.com/plphys/article-abstract/196/2/697/7691838)). So epigenetic changes allow these mutualisms to develop.
+
+# Describe what a GFF file is?
+
+A GFF file is a *genome feature file* format for spatial analysis of differential methylation. But in searching online, GFF is also referred to as *general feature format*.)
+
+# What are two ways describing CG motifs could have value?
+
+They are important epigenetic markers. They are targets for DNA methylation, where a methyl group is added to a cytosine base. CG sites are often found in gene promoters.
+
+They can also used to track genome evolution, as CG nucelotides are mutational hotspots. Regions that retain high CpG density despite mutational pressure might be functionally important and therefore evolutionarily conserved.
