@@ -1,5 +1,6 @@
 ---
 title: "Soil metagenomes from greenhouse study with biofertilizer"
+author: Renee Davis
 format:
   revealjs: 
     theme: simple
