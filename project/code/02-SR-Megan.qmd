@@ -10,7 +10,7 @@ Read files
 ls /home/shared/16TB_HDD_01/fish546/renee/
 ```
 
-DIamomd
+Diamond BLAST
 
 ```{bash}
     /home/shared/diamond-2.1.8 blastx \

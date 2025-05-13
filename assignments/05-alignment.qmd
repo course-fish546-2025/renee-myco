@@ -113,8 +113,8 @@ We get something like `#CHROM POS REF ALT QUAL INFO FORMAT output/F143_cgigas.sa
 
 I downloaded F143_mpile.vcf.gz to my desktop (small file) and imported it to a desktop version of IGV. Here are some screenshots. We left the reference as the default human (GRCh38/hg38).
 
-![This is the first view, showing all chromosomes.](output/IGV%20all.png)
+![This is the first view, showing all chromosomes.](IGV%20all.png)
 
-![Checking out chromosome 1.](output/IGV%20chr%201.png)
+![Checking out chromosome 1.](IGV%20chr%201.png)
 
-![Experimented with some of the controls and view functions. Here we are using the slider to hop around the chromosome and check things out.](output/IGV%20chr1%202.png)
+![Experimented with some of the controls and view functions. Here we are using the slider to hop around the chromosome and check things out.](IGV%20chr1%202.png)
