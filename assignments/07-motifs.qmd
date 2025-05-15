@@ -4,7 +4,7 @@ format: html
 editor: visual
 ---
 
-Rpubs link:
+Rpubs link: http://rpubs.com/reneedavis/CGmotifs
 
 # Loading R package seqinr and getting an output fasta file
 
@@ -71,13 +71,16 @@ output/10-seqs.fasta
 ```{bash}
 fuzznuc -sequence output/10-seqs.fasta -pattern CG -rformat gff -outfile CGoutput.gff
 ```
-And let's check to see that everything looks good. 
+
+And let's check to see that everything looks good.
+
 ```{r engine='bash', eval=TRUE}
 head -6 CGoutput.gff
 ```
-We get something like: 
 
-```
+We get something like:
+
+```         
 Show in New Window
 Search for patterns in nucleotide sequences
 Show in New Window
@@ -86,10 +89,11 @@ Show in New Window
 #!Date 2025-05-15
 #!Type DNA
 #!Source-version EMBOSS 6.6.0.0
-k141_28203	fuzznuc	nucleotide_motif	3	4	2	+	.	ID=k141_28203.1;note=*pat pattern:CG
+k141_28203  fuzznuc nucleotide_motif    3   4   2   +   .   ID=k141_28203.1;note=*pat pattern:CG
 ```
 
+# Visualizations in IGV
 
+![Viewing all 10 sequences with CG motifs.](07-IGV-screenshot1.png)
 
-
-
+![Clicking into 1 sequence with CG motif.](07-IGV-screenshot2.png)
