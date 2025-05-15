@@ -1,0 +1,95 @@
+---
+title: "07-motifs"
+format: html
+editor: visual
+---
+
+Rpubs link:
+
+# Loading R package seqinr and getting an output fasta file
+
+First we need to install the R package seqinr.
+
+```{r}
+library(seqinr)
+
+setwd("/home/shared/16TB_HDD_01/fish546/renee/build/megahit_F2R_KM41_out")
+
+# Replace 'input.fasta' with the name of the multi-sequence fasta file
+input_file <- "final.contigs.fa"
+sequences <- read.fasta(input_file)
+```
+
+```{r}
+# Set the seed for reproducibility (optional)
+set.seed(42)
+
+number_of_sequences_to_select <- 10
+
+if (length(sequences) < number_of_sequences_to_select) {
+  warning("There are fewer than 10 sequences in the fasta file. All sequences will be selected.")
+  number_of_sequences_to_select <- length(sequences)
+}
+
+selected_indices <- sample(length(sequences), number_of_sequences_to_select)
+selected_sequences <- sequences[selected_indices]
+```
+
+```{r}
+# Replace 'output.fasta' with the desired output file name
+output_file <- "output/10-seqs.fasta"
+write.fasta(selected_sequences, names(selected_sequences), output_file, open = "w")
+```
+
+# Creating an index for the 10-sequence fasta
+
+## Creating a necessary index for IGV viewing
+
+```{bash}
+#likely will not need; fix issue where gff and fa name did not match
+sed -i 's/>lcl|/>/g' output/10-seqs.fasta
+```
+
+Let's check things to see that we're on the right track.
+
+```{r engine='bash', eval=TRUE}
+head -1 output/10-seqs.fasta.fai
+```
+
+We get an output that looks like: k141_28203 601 12 60 61
+
+This means: Sequence name: k141_28203 Sequence length: 601 bases Sequence data starts at byte 16 in the FASTA file Each line contains 60 bases Each line is 61 bytes long (h/t to Lara's .qmd code file)
+
+```{bash}
+#needed downstream for IGV
+/home/shared/samtools-1.12/samtools faidx \
+output/10-seqs.fasta
+```
+
+## Finding the motifs
+
+```{bash}
+fuzznuc -sequence output/10-seqs.fasta -pattern CG -rformat gff -outfile CGoutput.gff
+```
+And let's check to see that everything looks good. 
+```{r engine='bash', eval=TRUE}
+head -6 CGoutput.gff
+```
+We get something like: 
+
+```
+Show in New Window
+Search for patterns in nucleotide sequences
+Show in New Window
+##gff-version 3
+##sequence-region k141_28203 1 601
+#!Date 2025-05-15
+#!Type DNA
+#!Source-version EMBOSS 6.6.0.0
+k141_28203	fuzznuc	nucleotide_motif	3	4	2	+	.	ID=k141_28203.1;note=*pat pattern:CG
+```
+
+
+
+
+
