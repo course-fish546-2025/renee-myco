@@ -1,0 +1,22 @@
+---
+title: "week8"
+format: html
+---
+
+# What is a genomic range and what 3 types of information do you need for a range?
+
+A genomic range is basically a range of locations in a genome or chromosome. The required pieces of information are: 1) chromosome name, range, and strand.
+
+# What does 0-based and 1-based refer to? What are the advantages and disadvantages of each?
+
+0-based and 1-based refer to the type of range or coordinate systems. 0-based coordinate systems use half-open/half-closed intervals. The first position is indexed as 0, the second as 1, etc. The start position is included, but the end is not. It's not as intuitive as 1-based systems, but the commands are simpler (e.g. to calculate how many bases a range spans, the command is `end - start + 1`).
+
+1-based coordinate systems use closed intervals. The first position is indexed as 1, the second as 2, etc. The start and end positions are included. It is easier to visualize, but a little more difficult to write commands for.
+
+# What is the value of BEDtools over the bioconductor package GenomicRange?
+
+Bioconductor GenomicRange is an R package that allows for highly interactive work with genomic interval data. For large and/or numerous files, it can be cumbersome to load it into R. For this, the command-line tool BEDtools is valuable. It can read a BED file and calculate coverage with one command.
+
+# Describe one subcommand of the BEDtools suite as well as a practical use case.
+
+One subcommand is `BEDtools intersect`. It computes the overlap between two sets of ranges. It finds regions where two or more files share at least one common base pair. You can intersect a set of regions of interest (e.g., *nif* gene cluster for nitrogenase enzyme) with other data (e.g. assembled metagenome) in BED/GFF/GTF formats. This might be a good tool to use for the project.
