@@ -9,6 +9,7 @@ assignments/data/*
 assignments/output/*
 project/megahit/*
 project/build/*
+project/output/*
 rna.fna
 
 data/*fast*

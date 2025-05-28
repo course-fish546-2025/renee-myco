@@ -1,0 +1,10 @@
+name: Publish Document
+title:
+username:
+account: rpubs
+server: rpubs.com
+hostUrl: rpubs.com
+appId: https://api.rpubs.com/api/v1/document/1311624/eff359b8b1614b3eaadab4d6afe87914
+bundleId: https://api.rpubs.com/api/v1/document/1311624/eff359b8b1614b3eaadab4d6afe87914
+url: http://rpubs.com/reneedavis/1311624
+version: 1

@@ -1,5 +1,5 @@
 ---
-title: "Rhizospheric fungal/bacteria metagenome project"
+title: "Soil metagenome project"
 format: html
 editor: 
   markdown: 
@@ -11,7 +11,7 @@ execute:
 
 # Introduction
 
-We are analyzing the metagenomes from 2 soil samples from a greenhouse study.
+We are analyzing the metagenomes from 2 soil samples from a greenhouse study from fall 2023.
 These will give us a sense of resident microbial (fungal and bacterial) communities prior to biofertilizer treatment.
 
 1.  F1B-KM40 - bulk field soil
@@ -409,7 +409,9 @@ Then we will query Diamond BLAST with the rhizospheric soil metagenome.
 --threads 40 2>&1 | tee --append output/daa2rma_log.txt
 ```
 
-The tree can be viewed here: ![](F2R-phylo.pdf)
+The tree can be viewed here:
+
+![](F2R-phylo.pdf)
 
 A total of 1002 taxa were detected.
 The top hits include Acidobacteria bacterium, Actinobacteria bacterium, Chloroflexi bacterium, Verrucomicrobia bacterium.
@@ -464,9 +466,167 @@ Most soil microbes are located in the rhizosphere, so this is consistent with ou
 
 # Metagenome data compare & contrast
 
-## Venn diagram
+Now that we have assembled metagenomes and taxonomy, we want to know how these metagenomes compare to one another.
+Specifically, we're interested in what taxa they have in common, and which are unique.
+
+We could export the data in Megan (.rma6 file) to a .txt, then convert the data into a common format like .xlsx or Google Sheets for comparison.
+But the .txt file sizes can be too large (\>600 MB) for these programs.
+Instead we can use some command-line tools to get a more manageable species list as a .txt in the output folder.
+
+```{bash}
+/home/shared/megan-6.24.20/tools/rma2info \
+    -i output/sr-blastx-f1b.meganized.rma6 \
+    -r2c Taxonomy \
+    -o output/f1b_species.txt
+
+/home/shared/megan-6.24.20/tools/rma2info \
+    -i output/sr-blastx-f2r.meganized.rma6 \
+    -s Taxonomy \
+    -o output/f2r_species.txt
+```
+
+Unfortunately, we only have the **numeric taxon IDs**, not species names.
+We can see species ID in the Megan GUI, but it's not being extracted with rma2info.
+
+So we'll hop over to R to read the files, map NCBI Taxonomy IDs to names, and summarize counts by species or genus.
+
+## R studio cleanup
+
+```{r}
+library(taxize)
+library(dplyr)
+library(readr)
+library(tidyr)
+
+Sys.setenv(ENTREZ_KEY = "d228d1d99f7f95247415e561fdb7a2bdd408") #tells taxize your NCBI ke
+
+map_taxa <- function(file_path, label) {
+  df <- read_tsv(file_path, col_names = c("read_id", "tax_id")) %>%
+    mutate(
+      source = label,
+      tax_id = as.character(tax_id) 
+    )
+  
+  unique_ids <- unique(df$tax_id)
+  
+  # Query NCBI with taxize
+  tax_lookup <- taxize::classification(unique_ids, db = "ncbi", messages = FALSE)
+  
+  # create data frame
+  tax_df <- bind_rows(lapply(tax_lookup, function(x) {
+    if (inherits(x, "data.frame")) {
+      x %>% 
+        filter(rank %in% c("genus", "species")) %>%
+        select(rank, name) %>%
+        pivot_wider(names_from = rank, values_from = name)
+    } else {
+      tibble(genus = NA_character_, species = NA_character_)
+    }
+  }), .id = "tax_id")
+  
+  # Coerce tax_id to character again to match df
+  tax_df <- tax_df %>% mutate(tax_id = as.character(tax_id))
+  
+  # Join and return selected columns
+  df %>%
+    left_join(tax_df, by = "tax_id") %>%
+    select(source, tax_id, genus, species)
+}
+
+# load in files
+f1b <- map_taxa("output/f1b_species.txt", "f1b")
+f2r <- map_taxa("output/f2r_species.txt", "f2r")
+
+# Combine/summarize
+combined <- bind_rows(f1b, f2r) %>%
+  group_by(source, genus, species) %>%
+  summarise(n_reads = n(), .groups = "drop") %>%
+  arrange(desc(n_reads))
+
+# pivot for easier comparison
+pivoted <- combined %>%
+  unite("taxon", genus, species, sep = " ", na.rm = TRUE) %>%
+  pivot_wider(names_from = source, values_from = n_reads, values_fill = 0)
+
+print(pivoted)
+
+# save results to .csv for sharing
+write_csv(pivoted, "output/taxon_comparison.csv")
+```
+
+The .csv file was imported to a [GoogleSheet](https://docs.google.com/spreadsheets/d/17zBLVZRbQTe3CWWvw7eCXMDAFYVOvWw2F1nQBfJMNGU/edit?gid=612554532#gid=612554532) for cleanup, and exported as a new metagenome_comparison.csv for further analysis and visualization.
+
+## Venn diagram and scatterplot of shared and unique taxa
+
+```{r,eval=TRUE}
+# Load required packages
+library(tidyverse)
+library(VennDiagram)
+
+# load data
+data <- read_csv("output/metagenome_comparison.csv")
+
+# Prepare presence/absence
+data_presence <- data %>%
+  mutate(
+    F1B_present = F1B > 0,
+    F2R_present = F2R > 0
+  )
+
+# Venn diagram counts
+only_F1B <- sum(data_presence$F1B_present & !data_presence$F2R_present)
+only_F2R <- sum(!data_presence$F1B_present & data_presence$F2R_present)
+both <- sum(data_presence$F1B_present & data_presence$F2R_present)
+
+# Draw Venn diagram
+venn.plot <- draw.pairwise.venn(
+  area1 = only_F1B + both,
+  area2 = only_F2R + both,
+  cross.area = both,
+  category = c("F1B", "F2R"),
+  fill = c("skyblue", "orange"),
+  alpha = 0.5,
+  cat.pos = c(-20, 20),
+  scaled = FALSE
+)
+
+# save to PDF
+pdf("taxa_venn_diagram.pdf")
+grid.draw(venn.plot)
+dev.off()
+
+# abundance scatterplot data rep
+scatter_data <- data_presence %>%
+  mutate(
+    shared_status = case_when(
+      F1B_present & F2R_present ~ "Shared",
+      F1B_present & !F2R_present ~ "F1B only",
+      !F1B_present & F2R_present ~ "F2R only"
+    )
+  )
+
+# Scatter plot comparing abundances
+ggplot(scatter_data, aes(x = F1B, y = F2R, color = shared_status)) +
+  geom_point(alpha = 0.7) +
+  scale_x_log10() +
+  scale_y_log10() +
+  scale_color_manual(values = c("Shared" = "purple", "F1B only" = "blue", "F2R only" = "red")) +
+  labs(
+    title = "Comparison of Taxon Abundance Between Metagenomes",
+    x = "F1B Read Counts (log10 scale)",
+    y = "F2R Read Counts (log10 scale)",
+    color = "Taxon Status"
+  ) +
+  theme_minimal()
+
+# Optionally save scatter plot
+ggsave("taxa_abundance_comparison.png", width = 8, height = 6)
+
+```
 
 # Analysis of nitrogenase gene clusters
+
+We will need to use some annotation tools to screen for *nif* genes (e.g., **nifH**, **nifD**, **nifK**).
 
 ## *nif* gene activity between samples
 
