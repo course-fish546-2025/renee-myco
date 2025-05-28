@@ -1,0 +1,100 @@
+---
+title: "08-BEDtools"
+format: html
+editor: visual
+---
+
+# Getting BAM files to work with
+
+For this we will use some pre existing BAM files from the Roberts Lab.
+
+```{bash}
+cd data 
+curl -O https://gannet.fish.washington.edu/seashell/bu-mox/scrubbed/120321-cvBS/19F_R1_val_1_bismark_bt2_pe.deduplicated.sorted.bam 
+curl -O https://gannet.fish.washington.edu/seashell/bu-mox/scrubbed/120321-cvBS/19F_R1_val_1_bismark_bt2_pe.deduplicated.sorted.bam.bai
+```
+
+Now we need a bed file with gene information.
+
+```{bash}
+cd data 
+curl -O https://eagle.fish.washington.edu/Cvirg_tracks/C_virginica-3.0_Gnomon_genes.bed
+```
+
+# Converting BAM to BED files
+
+```{bash}
+/home/shared/bedtools2/bin/bedtools bamtobed \
+-i data/19F_R1_val_1_bismark_bt2_pe.deduplicated.sorted.bam \
+> output/08-19F.bed
+```
+
+This is a large file, so we need to add it to gitignore.
+
+# Getting coverage of sequence reads on gene regions
+
+After each interval in A, BEDtools coverage will report:
+
+1.  The number of features in B that overlapped (by at least one base pair) the A interval.
+
+2.  The number of bases in A that had non-zero coverage from features in B.
+
+3.  The length of the entry in A.
+
+4.  The fraction of bases in A that had non-zero coverage from features in B.
+
+```{bash}
+/home/shared/bedtools2/bin/bedtools coverage \
+-a data/C_virginica-3.0_Gnomon_genes.bed \
+-b output/08-19F.bed \
+> output/08-gene-19F-coverage.out
+```
+
+# Intersect
+
+Intersect shows the overlaps between specific regions. To start, we will get a BED file of Transposable Elements and lncRNAs.
+
+```{bash}
+cd data
+curl -O http://owl.fish.washington.edu/halfshell/genomic-databank/cgigas_uk_roslin_v1_gene.gff
+curl -O http://owl.fish.washington.edu/halfshell/genomic-databank/cgigas_uk_roslin_v1_rm.te.bed
+curl -O http://owl.fish.washington.edu/halfshell/genomic-databank/cgigas_uk_roslin_v1_lncRNA.gff
+```
+
+```{bash}
+/home/shared/bedtools2/bin/bedtools intersect \
+-a data/cgigas_uk_roslin_v1_gene.gff \
+-b data/cgigas_uk_roslin_v1_rm.te.bed \
+> output/08-gene-TE-intersect.out
+
+head -2 output/08-gene-TE-intersect.out
+```
+
+For the head command, the output looks like this:
+
+```         
+NC_047559.1 Gnomon  gene    19138   19160   .   -   .   ID=gene-LOC117687066;Dbxref=GeneID:117687066;Name=LOC117687066;gbkey=Gene;gene=LOC117687066;gene_biotype=protein_coding
+```
+
+# Closest
+
+```{bash}
+/home/shared/bedtools2/bin/bedtools closest \
+-a data/cgigas_uk_roslin_v1_lncRNA.gff \
+-b data/cgigas_uk_roslin_v1_gene.gff \
+> output/08-lnc-gene-closet.out
+```
+
+```{bash}
+head -2 output/08-lnc-gene-closet.out
+```
+
+The output file looks like this:
+
+```         
+NC_047559.1 Gnomon  lnc_RNA 9839    11386   .   +   .   ID=rna-XR_004604272.1;Parent=gene-LOC117693020;Dbxref=GeneID:117693020,Genbank:XR_004604272.1;Name=XR_004604272.1;gbkey=ncRNA;gene=LOC117693020;model_evidence=Supporting evidence includes similarity to: 1 EST%2C and 100%25 coverage of the annotated genomic feature by RNAseq alignments%2C including 15 samples with support for all annotated introns;product=uncharacterized LOC117693020;transcript_id=XR_004604272.1  NC_047559.1 Gnomon
+```
+
+# References
+
+https://sr320.github.io/course-fish546-2025/assignments/08-bedtools.html

@@ -4,7 +4,12 @@ format: html
 editor: 
   markdown: 
     wrap: sentence
+execute:
+  eval: false
+  engine: knitr
 ---
+
+# Introduction
 
 We are analyzing the metagenomes from 2 soil samples from a greenhouse study.
 These will give us a sense of resident microbial (fungal and bacterial) communities prior to biofertilizer treatment.
@@ -14,7 +19,7 @@ These will give us a sense of resident microbial (fungal and bacterial) communit
 
 # Data upload
 
-The goal for week 2 is to upload fastq files to Raven server.
+To begin, we will upload fastq files to Raven server.
 Note that this needs to be done from the local terminal, not the one on the server.
 
 ```{bash}
@@ -173,7 +178,8 @@ We will use the paired files for most downstream steps like merging and assembly
 ## Merging forward and reverse reads using fastp
 
 These are R1/R2 (forward and reverse reads) and will have to be merged.
-This is the last component of pre-processing as we work towards metagenome assembly. For this we will use fastp which is already installed on Raven.
+This is the last component of pre-processing as we work towards metagenome assembly.
+For this we will use fastp which is already installed on Raven.
 
 ```{bash}
 cd /home/shared/16TB_HDD_01/fish546/renee
@@ -356,37 +362,137 @@ We should get something that looks like this:
 GGGGAACGCGCGCGGACGCGGGAAGGCCGCCTTCAGGTCGAAC
 ```
 
-`>` = start of a header.For the meta data: k141 refers to the k-mer size (k=141) used when assembling that contig. 8240 is the ID or serial number assigned to that contig. It's the name of the contig. Then there is the internal MEGAHIT flag for the contig, usually about whether the contig is trusted/high-confidence (flag=1 usually means it's "normal" and usable). Then there is the multiplicity (or coverage estimate), which refers to how many times this contig appeared in the assembly graph. Finally, we have the contig length. 
+`>` = start of a header.For the meta data: k141 refers to the k-mer size (k=141) used when assembling that contig.
+8240 is the ID or serial number assigned to that contig.
+It's the name of the contig.
+Then there is the internal MEGAHIT flag for the contig, usually about whether the contig is trusted/high-confidence (flag=1 usually means it's "normal" and usable).
+Then there is the multiplicity (or coverage estimate), which refers to how many times this contig appeared in the assembly graph.
+Finally, we have the contig length.
 
-# Annotation using MG-RAST
+# Phylogenetic trees using Megan
 
-MG-RAST (metagenomics Rapid Annotation using Subsystem Technology) is an open source, browser based annotation tool that has been previously been used in Winkler lab bioinformatics projects.
-There is a [user manual]((metagenomics%20Rapid%20Annotation%20using%20Subsystem%20Technology)).
+MEGAN is a program that graphs the taxonomical content from metagenomic data sets.
+To start, we will read in files.
 
-# Next steps (week 5-9)
+```{bash}
+ls /home/shared/16TB_HDD_01/fish546/renee/
+```
 
-1.  marker gene extraction - identify 16S (bacteria) and ITS (fungi) reads (OR annotation?)
+## F2R - rhizospheric soil
 
-2.  taxonomic classification
+Then we will query Diamond BLAST with the rhizospheric soil metagenome.
 
-3.  visualizations
+```{bash}
+    /home/shared/diamond-2.1.8 blastx \
+    --db /home/shared/16TB_HDD_01/sam/databases/blastdbs/ncbi-nr-20250429.dmnd \
+    --query /home/shared/16TB_HDD_01/fish546/renee/F2R-KM41_merged.fastq.gz \
+    --out output/sr-blastx.daa \
+    --outfmt 100 \
+    --top 5 \
+    --block-size 15.0 \
+    --index-chunks 4 \
+    --threads 32
+```
+
+```{bash}
+    /home/shared/megan-6.24.20/tools/daa-meganizer \
+    --in output/sr-blastx.daa \
+    --threads 32 \
+    --mapDB /home/shared/16TB_HDD_01/sr320/github/renee-myco/project/data/megan-map-Feb2022.db  
+```
+
+```{bash}
+/home/shared/megan-6.24.20/tools/daa2rma \
+--in output/sr-blastx.daa \
+--mapDB /home/shared/16TB_HDD_01/sr320/github/renee-myco/project/data/megan-map-Feb2022.db \
+--out output/sr-blastx-meganized.rma6 \
+--threads 40 2>&1 | tee --append output/daa2rma_log.txt
+```
+
+The tree can be viewed here: ![](F2R-phylo.pdf)
+
+A total of 1002 taxa were detected.
+The top hits include Acidobacteria bacterium, Actinobacteria bacterium, Chloroflexi bacterium, Verrucomicrobia bacterium.
+(All are bacteria.) Groups of fungi detected include: Mortierellaceae, Diversisporales, Paraglomus, Rhizophagus, Metarhizium.
+
+## F1B - bulk field soil
+
+Now we will perform the same functions using the second fasta file.
+First we run the fastq file against the NCBI database.
+
+```{bash}
+    /home/shared/diamond-2.1.8 blastx \
+    --db /home/shared/16TB_HDD_01/sam/databases/blastdbs/ncbi-nr-20250429.dmnd \
+    --query /home/shared/16TB_HDD_01/fish546/renee/F1B-KM40_merged.fastq.gz \
+    --out output/sr-blastx-f1b.daa \
+    --outfmt 100 \
+    --top 5 \
+    --block-size 15.0 \
+    --index-chunks 4 \
+    --threads 32
+```
+
+Then we start to get the data in MEGAN.
+
+```{bash}
+    /home/shared/megan-6.24.20/tools/daa-meganizer \
+    --in output/sr-blastx-f1b.daa \
+    --threads 32 \
+    --mapDB /home/shared/16TB_HDD_01/sr320/github/renee-myco/project/data/megan-map-Feb2022.db 
+```
+
+This produces a .rma file that can be opened into MEGAN and the metadata used to create a phylogenetic tree.
+
+```{bash}
+/home/shared/megan-6.24.20/tools/daa2rma \
+--in output/sr-blastx-f1b.daa \
+--mapDB /home/shared/16TB_HDD_01/sr320/github/renee-myco/project/data/megan-map-Feb2022.db \
+--out output/sr-blastx-f1b.meganized.rma6 \
+--threads 40 2>&1 | tee --append output/daa2rma_log2.txt
+```
+
+The tree can be viewed here:
+
+![](F1B-phylo.pdf)
+
+A total of 933 taxa were detected.
+The top hits include Acidobacteria bacterium, Alphaproteobacteria bacterium, Betaproteobacteria bacterium, Deltaproteobacteria bacterium.
+(All are bacteria.) Groups of fungi detected include: Mortierellaceae, Diversisporales, Paraglomus, Rhizophagus, Aspergillaceae.
+
+While there are fewer taxa than in rhizosphere soil, the general composition seems to be similar.
+Most soil microbes are located in the rhizosphere, so this is consistent with our expectations.
+
+# Metagenome data compare & contrast
+
+## Venn diagram
+
+# Analysis of nitrogenase gene clusters
+
+## *nif* gene activity between samples
+
+# Conclusions
 
 # References
 
 Bolger, A. M., Lohse, M., & Usadel, B.(2014). Trimmomatic: A flexible trimmer for Illumina Sequence Data.
 Bioinformatics, btu170.
 
-F. Meyer, D. Paarmann, M. D'Souza, R. Olson , E.
-M. Glass, M. Kubal, T. Paczian, A. Rodriguez, R. Stevens, A. Wilke, J. Wilkening, and R.
+F. Meyer, D. Paarmann, M. D'Souza, R. Olson , E.M.
+Glass, M. Kubal, T. Paczian, A. Rodriguez, R. Stevens, A. Wilke, J. Wilkening, and R.
 A. Edwards.
 The Metagenomics RAST server --- A public resource for the automatic phylogenetic and functional analysis of metagenomes.
 BMC Bioinformatics 2008, 9:386.
 [http://www.biomedcentral.com/1471-2105/ 9/386](http://www.biomedcentral.com/1471-2105/9/386)
 
+Huson DH, Auch AF, Qi J, Schuster SC. MEGAN analysis of metagenomic data.
+Genome Res. 2007 Mar;17(3):377-86.
+doi: 10.1101/gr.5969107.
+Epub 2007 Jan 25.
+PMID: 17255551; PMCID: PMC1800929.
+
 Thomas T, Gilbert J, Meyer F. Metagenomics - a guide from sampling to data analysis.
 Microb Inform Exp. 2012 Feb 9;2(1):3.
 doi: 10.1186/2042-5783-2-3.
-PMID: 22587947; PMCID: PMC3351745.
 
 Zhang J, Kobert K, Flouri T, Stamatakis A. PEAR: A fast and accurate Illimuna Paired-End reAd mergeR.
 

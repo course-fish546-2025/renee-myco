@@ -1,0 +1,29 @@
+---
+title: "week9"
+format: html
+---
+
+# What is your goal with respect to your research project to get accomplished this week?
+I really want to get all the work done this week, and be touching up the compendium and slides next week before the presentation. I fell behind and have some catch-up to do this week. (We had a major water leak in Ben Hall, and it totally consumed my Thurs/Fri last week and I had a lot of lab task catch up to do. Not fun.)
+
+This means: run a comparison between the 2 metagenome data sets (who overlaps/who's unique to each metagenome), filter for nif/nitrogenase gene clusters, and figure out a graph. 
+
+# What is the overall status of your research repo? Is it will organized with a clear Readme file? Are file names and directory clear? Would your classmates be able to understand what the code in your files is designed to do?
+I think my repo is well organized (is it?). There is a clear Readme file, and my classmates should be able to navigate it. I would love it if one of my classmates could check it out and see if that's actually true. 
+
+# Go to one of your classmates rpubs link (see issues). What are three things you think are neat? What are two things that are really not that clear to you?
+
+I went to Hannia's rpub link. 3 things I think are neat: 
+
+1. slide 9 - "Top 50 most deferentially expressed genes" - great graphic, some interpretation down the line would be cool. 
+
+2. slide 6- "1. RNA-seq quantification using Kallisto" - nice code comments!
+
+3. slide 3 - methods are clearly stated and easy to follow
+
+2 things that are unclear: 
+
+1. slide 2 - could use a clearer project goal
+
+2. slide 8 - unclear how to see the full 100 results. Can't seem to scroll down?
+

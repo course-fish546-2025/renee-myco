@@ -1,0 +1,68 @@
+Version   MEGAN Community Edition (version 6.24.20, built 5 Feb 2023)
+Author(s) Daniel H. Huson
+Copyright (C) 2023 Daniel H. Huson. This program comes with ABSOLUTELY NO WARRANTY.
+Functional classifications to use: EC, EGGNOG, GTDB, INTERPRO2GO, SEED
+Loading ncbi.map: 2,396,736
+Loading ncbi.tre: 2,396,740
+Loading ec.map:     8,200
+Loading ec.tre:     8,204
+Loading eggnog.map:    30,875
+Loading eggnog.tre:    30,986
+Loading gtdb.map:   240,103
+Loading gtdb.tre:   240,107
+Loading interpro2go.map:    14,242
+Loading interpro2go.tre:    28,907
+Loading seed.map:       961
+Loading seed.tre:       962
+In DAA file:  output/sr-blastx-f1b.daa
+Output file:  output/sr-blastx-f1b.meganized.rma6
+Classifications: Taxonomy, SEED, EGGNOG, GTDB, EC, INTERPRO2GO
+Generating RMA6 file Parsing matches
+Annotating RMA6 file using FAST mode (accession database and first accession per line)
+Parsing file sr-blastx-f1b.daa
+Parsing file: output/sr-blastx-f1b.daa
+10% 20% 30% 40% 50% 60% 70% 80% 90% 100% (1,342.1s)
+Total reads:         6,079,411
+Alignments:         62,021,820
+100% (0.0s)
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm for binning: Taxonomy
+Using Best-Hit algorithm for binning: SEED
+Using Best-Hit algorithm for binning: EGGNOG
+Using 'Naive LCA' algorithm for binning: GTDB
+Using Best-Hit algorithm for binning: EC
+Using Best-Hit algorithm for binning: INTERPRO2GO
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:        6,079,411
+With hits:           6,079,411 
+Alignments:         62,021,820
+Assig. Taxonomy:     2,481,785
+Assig. SEED:           805,608
+Assig. EGGNOG:         269,594
+Assig. GTDB:         1,792,903
+Assig. EC:             689,919
+Assig. INTERPRO2GO:    489,294
+MinSupport set to: 607
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:      28,359
+Binning reads: Applying min-support & disabled filter to GTDB...
+Min-supp. changes:      26,826
+Binning reads: Writing classification tables
+Numb. Tax. classes:        831
+Numb. SEED classes:        704
+Numb. EGG. classes:      2,491
+Numb. GTDB classes:        812
+Numb.   EC classes:      3,380
+Numb. INT. classes:      8,162
+Binning reads: Syncing
+Class. Taxonomy:           831
+Class. SEED:               704
+Class. EGGNOG:           2,491
+Class. GTDB:               812
+Class. EC:               3,380
+Class. INTERPRO2GO:      8,162
+100% (2,080.2s)
+Total time:  3,429.0s
+Peak memory: 81.7 of 488.3G
