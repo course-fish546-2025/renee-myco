@@ -1,6 +1,7 @@
 ---
 title: "Soil metagenome project"
 format: html
+toc: true
 editor: 
   markdown: 
     wrap: sentence
@@ -9,18 +10,38 @@ execute:
   engine: knitr
 ---
 
+![](06-presentation_files/vanburn-gonsalves-S6IalhfacLY-unsplash.jpg)
+
 # Introduction
 
-We are analyzing the metagenomes from 2 soil samples from a greenhouse study from fall 2023.
-These will give us a sense of resident microbial (fungal and bacterial) communities prior to biofertilizer treatment.
+Soil microbial ecology is complex and its composition depends on several factors.
+Soil microbial communits are found in higher concentrations in the rhizosphere, or root space.
+Plant roots provide carbohydrates and niches for microbes to flourish.
+Some of these microbes fix nitrogen, solubilize phosphorous, and perform other necessary activities.
+Additionally, mutualistic mycorrhizal fungi also provide structures for microbial residence and travel.
+Together, these underground dynamics boost soil carbon and nitrogen, further supporting plant growth and driving these biophilic cycles.
+However, anthropogenic disturbances like tilling and synthetic fertilizer use create soil dysbiosis and farm this ecological balance.
+BioBead is an innovative biodegradable hydrogel containing microbial consortia for soil health, addressing multiple factors in nutrient cycling and soil health.
 
-1.  F1B-KM40 - bulk field soil
-2.  F2R-KM41 - rhizosphere soil
+For this study, I analyzed the metagenomes from 2 (out of 48) soil samples from a recent BioBead greenhouse trial with wheat plants.
+These will give me a sense of resident microbial (fungal and bacterial) communities prior to treatment BioBead, conventional fertilizer, and others.
+
+1.  F1B - bulk field soil
+2.  F2R - rhizosphere soil
+
+The soil samples were collected at the end of experiment from each treatment, and the DNA was extracted with Qiagen DNAEasy PowerSoil kits.
+Shotgun metagenome sequencing was provided by Eurofins Genomics.
+
+The purpose of this exercise is to understand shared vs unique taxa in each sample, and screen for the presence of nitrogenase genes.
+These are important, as organisms that fix nitrogen to the soil reduce the need for synthetic fertilizer input.
+I expect there to be a more diverse microbial community in the rhizosphere soil sample sample over the bulk one.
+Additionally, I expect to find more *nif* gene abundance in the rhizosphere sample.
+If this pipeline is effective, it will be scaled to analyze the entire 48 metagenome data set.
 
 # Data upload
 
-To begin, we will upload fastq files to Raven server.
-Note that this needs to be done from the local terminal, not the one on the server.
+To begin, I will upload a raw fastq file to Raven server.
+(Note that this needs to be done from the local terminal, not the server.)
 
 ```{bash}
 # move files from lab drive to Raven
@@ -28,8 +49,7 @@ scp "/Volumes/CRUZER16GB/F1B-KM40_R1_001.fastq.gz" \
 rendavis@raven.fish.washington.edu:/home/shared/16TB_HDD_01/fish546/renee/
 ```
 
-That was successful.
-Now we upload the rest using rsync instead (better for handling multiple files, fewer chances of duplicates, conflicts etc).
+Once successful, I uploaded the rest using rsync instead (better for handling multiple files, fewer chances of duplicates, conflicts etc).
 
 ```{bash}
 # move remaining files from lab drive to Raven
@@ -42,7 +62,7 @@ rsync -av --progress \
 
 ## Checksums
 
-Before we begin working, let's run a MD5 check on the 4 metagenome fastq files.
+Before I began working, I ran a MD5 check on the 4 metagenome fastq files.
 
 ```{bash}
 find . -type f -exec md5sum-lite {} \; >> output.txt  #found all files in the working directory, calculated its MD5 checksum, save to an output txt file
@@ -63,7 +83,7 @@ e34585c824e429f54ff34d919719f1c4  ./F1B-KM40_R1_001.fastq.gz
 mv output.txt md5checksums_metagenomes_2025.txt #renamed the file to something more descriptive
 ```
 
-To validate file integrity later, you could run the following code to ensure a match.
+To validate file integrity later, one could run the following code to ensure a match.
 
 ```{bash}
 md5sum -c md5checksums_metagenomes_2025.txt
@@ -74,7 +94,7 @@ md5sum -c md5checksums_metagenomes_2025.txt
 ### FastQC
 
 I have been told that QC has been run on these, but we won't take that at face value.
-For this we will use FastQC.
+For this I will use FastQC.
 
 ```{bash}
 # run FastQC on the fastq files
@@ -88,7 +108,7 @@ Analysis complete for F1B-KM40_R1_001.fastq.gz
 Analysis complete for F1B-KM40_R2_001.fastq.gz
 ```
 
-.png files downloaded to my desktop.
+The .png files were downloaded to my desktop.
 
 ### MultiQC
 
@@ -102,7 +122,7 @@ cd output
 multiqc .
 ```
 
-See html report in output folder.
+The html report was saved in the output folder.
 
 # Preprocessing
 
@@ -111,19 +131,19 @@ This involves 2 steps: trimming and merging forward and reverse reads.
 
 ## Trimming using Trimmomatic
 
-We need to trim raw data to remove adapters and low-quality bases.
+I need to trim raw data to remove adapters and low-quality bases.
 It's important to do this prior to merging, as merging reads relies on the overlapping region between forward and reverse reads.
-If you try to merge before trimming, you could end up with incorrect overlaps, low quality merges, and related issues.
+If I try to merge before trimming, I could end up with incorrect overlaps, low quality merges, and related issues.
 
-For this step we will use [Trimmomatic](#0), which we will have to install manually.
+For this step we will use [Trimmomatic](#0), which I will had to install.
 
 ```{bash}
 scp -r ~/Downloads/Trimmomatic-0.39 rendavis@raven.fish.washington.edu:/home/shared/16TB_HDD_01/fish546/renee  #from the local terminal
 ```
 
-Now we will run it to trim adapters and low quality bases.
-We'll stick with defaults of greater than or equal to 50 base pairs (bp), and 3 leading and trailing bp.
-We will do this in 2 steps with F1B R1/R2 and then F2R R1/R2.
+Now I will run it to trim adapters and low quality bases.
+I'll stick with defaults of greater than or equal to 50 base pairs (bp), and 3 leading and trailing bp.
+I'll do this in 2 steps with F1B R1/R2 and then F2R R1/R2.
 
 ```{bash}
 cd /home/shared/16TB_HDD_01/fish546/renee
@@ -173,7 +193,7 @@ Trimmomatic produces **unpaired** and **paired** file outputs.
 Paired reads are those which both forward and reverse survived trimming.
 Unpaired reads indicate where only one of the pair survived (the other was discarded due to low quality or short length).
 
-We will use the paired files for most downstream steps like merging and assembly, but will keep the unpaired files around just in case we need to embark on deeper analysis.
+I'll use the paired files for most downstream steps like merging and assembly, but will keep the unpaired files around just in case we need to embark on deeper analysis.
 
 ## Merging forward and reverse reads using fastp
 
@@ -295,7 +315,7 @@ F1B has higher per base sequence quality, but both look good.
 
 ## Installation
 
-First we clone the repository into our working folder.
+First I clone the repository into our working folder.
 
 ```{bash}
 cd /home/shared/16TB_HDD_01/fish546/renee/
@@ -303,7 +323,7 @@ git clone https://github.com/voutcn/megahit.git #this brings the installation fi
 cd megahit #navigating to the folder
 ```
 
-Then we have to compile MEGAHIT.
+Then I have to compile MEGAHIT.
 
 ```{bash}
 cd /home/shared/16TB_HDD_01/fish546/renee/
@@ -315,9 +335,9 @@ make
 ./megahit --version # tests the installation; MEGAHIT v1.2.9
 ```
 
-## Assembly process
+## Assembly
 
-Once this is done, we run each file independently to produce two assemblies.
+Once this is done, I ran each file independently to produce two assemblies.
 
 ```{bash}
 cd /home/shared/16TB_HDD_01/fish546/renee/build  #pointing wd to the binary files
@@ -339,9 +359,9 @@ cd /home/shared/16TB_HDD_01/fish546/renee/build
 
 Each run took 120 minutes.
 
-## Check files
+### File check
 
-We want to see a text file when we check files using the head command.
+I want to see a text file when we check files using the head command.
 
 ```{bash}
 #check F1B_KM40
@@ -355,7 +375,7 @@ cd /home/shared/16TB_HDD_01/fish546/renee/build/megahit_F2R_KM41_out
 head final.contigs.fa
 ```
 
-We should get something that looks like this:
+The output should like this:
 
 ```         
 >k141_8240 flag=1 multi=2.0000 len=511
@@ -372,7 +392,7 @@ Finally, we have the contig length.
 # Phylogenetic trees using Megan
 
 MEGAN is a program that graphs the taxonomical content from metagenomic data sets.
-To start, we will read in files.
+To start, I'll read in files.
 
 ```{bash}
 ls /home/shared/16TB_HDD_01/fish546/renee/
@@ -398,7 +418,7 @@ Then we will query Diamond BLAST with the rhizospheric soil metagenome.
     /home/shared/megan-6.24.20/tools/daa-meganizer \
     --in output/sr-blastx.daa \
     --threads 32 \
-    --mapDB /home/shared/16TB_HDD_01/sr320/github/renee-myco/project/data/megan-map-Feb2022.db  
+    --mapDB /home/shared/16TB_HDD_01/sr320/github/renee-myco/project/data/megan-map-Feb2022.db
 ```
 
 ```{bash}
@@ -414,8 +434,7 @@ The tree can be viewed here:
 ![](F2R-phylo.pdf)
 
 A total of 1002 taxa were detected.
-The top hits include Acidobacteria bacterium, Actinobacteria bacterium, Chloroflexi bacterium, Verrucomicrobia bacterium.
-(All are bacteria.) Groups of fungi detected include: Mortierellaceae, Diversisporales, Paraglomus, Rhizophagus, Metarhizium.
+The top hits include *Acidobacteria bacterium, Actinobacteria bacterium, Chloroflexi bacterium, Verrucomicrobia bacterium.* (All are bacteria.) Genera of fungi detected include: *Mortierellaceae, Diversisporales, Paraglomus, Rhizophagus, Metarhizium*.
 
 ## F1B - bulk field soil
 
@@ -458,37 +477,36 @@ The tree can be viewed here:
 ![](F1B-phylo.pdf)
 
 A total of 933 taxa were detected.
-The top hits include Acidobacteria bacterium, Alphaproteobacteria bacterium, Betaproteobacteria bacterium, Deltaproteobacteria bacterium.
-(All are bacteria.) Groups of fungi detected include: Mortierellaceae, Diversisporales, Paraglomus, Rhizophagus, Aspergillaceae.
+The top hits include *Acidobacteria bacterium, Alphaproteobacteria bacterium, Betaproteobacteria bacterium, Deltaproteobacteria bacterium.* (All are bacteria.) Groups of fungi detected include: *Mortierellaceae, Diversisporales, Paraglomus, Rhizophagus, Aspergillaceae.*
 
 While there are fewer taxa than in rhizosphere soil, the general composition seems to be similar.
 Most soil microbes are located in the rhizosphere, so this is consistent with our expectations.
 
-# Metagenome data compare & contrast
+# Metagenome data comparison
 
-Now that we have assembled metagenomes and taxonomy, we want to know how these metagenomes compare to one another.
-Specifically, we're interested in what taxa they have in common, and which are unique.
+Now that I have assembled metagenomes and taxonomy, I want to know how these metagenomes compare to one another.
+Specifically, I'm interested in what taxa they have in common and which are unique.
 
-We could export the data in Megan (.rma6 file) to a .txt, then convert the data into a common format like .xlsx or Google Sheets for comparison.
+I could export the data in Megan (.rma6 file) to a .txt, then convert the data into a common format like .xlsx or Google Sheets for comparison.
 But the .txt file sizes can be too large (\>600 MB) for these programs.
-Instead we can use some command-line tools to get a more manageable species list as a .txt in the output folder.
+Instead I can use some command-line tools to get a more manageable species list as a .txt in the output folder.
 
 ```{bash}
-/home/shared/megan-6.24.20/tools/rma2info \
-    -i output/sr-blastx-f1b.meganized.rma6 \
-    -r2c Taxonomy \
-    -o output/f1b_species.txt
-
 /home/shared/megan-6.24.20/tools/rma2info \
     -i output/sr-blastx-f2r.meganized.rma6 \
     -s Taxonomy \
     -o output/f2r_species.txt
+    
+/home/shared/megan-6.24.20/tools/rma2info \
+    -i output/sr-blastx-f1b.meganized.rma6 \
+    -r2c Taxonomy \
+    -o output/f1b_species.txt
 ```
 
 Unfortunately, we only have the **numeric taxon IDs**, not species names.
 We can see species ID in the Megan GUI, but it's not being extracted with rma2info.
 
-So we'll hop over to R to read the files, map NCBI Taxonomy IDs to names, and summarize counts by species or genus.
+So I'll use R to read the files, map NCBI Taxonomy IDs to names, and summarize counts by species or genus.
 
 ## R studio cleanup
 
@@ -619,18 +637,176 @@ ggplot(scatter_data, aes(x = F1B, y = F2R, color = shared_status)) +
   ) +
   theme_minimal()
 
-# Optionally save scatter plot
+# save scatter plot
 ggsave("taxa_abundance_comparison.png", width = 8, height = 6)
-
 ```
 
 # Analysis of nitrogenase gene clusters
 
-We will need to use some annotation tools to screen for *nif* genes (e.g., **nifH**, **nifD**, **nifK**).
+Nitrogenase is a bacterial enzyme that fixes atmospheric nitrogen (N2) to ammonia (NH3).
+It consists of alpha (*nif*D) and beta (*nif*K) subunits of the molybdenum-iron protein and an ATP-binding iron-sulfur protein (*nif*H).
+We will need to use some annotation tools to screen for *nif* genes in our samples (e.g., ***nif*****H**, ***nif*****D**, ***nif*****K**).
+
+-   *nif*H: [NCBI HMM accession TIGR01287.1](https://www.ncbi.nlm.nih.gov/genome/annotation_prok/evidence/TIGR01287/)
+-   *nif*K: [NCBI HMM accession TIGR01286.1](https://www.ncbi.nlm.nih.gov/genome/annotation_prok/evidence/TIGR01286/)
+-   *nif*D: [NCBI HMM accession TIGR01282.1](https://www.ncbi.nlm.nih.gov/genome/annotation_prok/evidence/TIGR01282/)
+
+To do this, we will use a tool called HMMER to search sequence databases for sequence homologs like nif genes.
+It uses probabilistic models called profile hidden Markov models (profile HMMs).
 
 ## *nif* gene activity between samples
 
+In theory, we could use HMMER to get the number of nitrogenase genes directly from our contigs.fa files.
+But since nitrogenase genes are protein-coding, and HMMER works best on predicted proteins, raw nucleotide sequences like your contigs.fa are not ideal and could lead to false negatives.
+
+### Prodigal for gene prediction
+
+First, I need to predict proteins from the contigs from the assembly step.
+Prodigal was cloned from GitHub, installed `/home/shared/16TB_HDD_01/fish546/renee/` and compiled using commands similar to those in previous sections.
+
+```{bash}
+/home/shared/16TB_HDD_01/fish546/renee/Prodigal/prodigal \
+  -i /home/shared/16TB_HDD_01/fish546/renee/build/megahit_F2R_KM41_out/final.contigs.fa \
+  -a /home/shared/16TB_HDD_01/fish546/renee/build/megahit_F2R_KM41_out/predicted_proteins.faa \
+  -d /home/shared/16TB_HDD_01/fish546/renee/build/megahit_F2R_KM41_out/predicted_nucleotides.fna \
+  -o /home/shared/16TB_HDD_01/fish546/renee/build/megahit_F2R_KM41_out/prodigal_output.gbk \
+  -f gbk \
+  -p meta
+```
+
+The output confirmed a number of hits for this file.
+We can see predicted_proteins.faa, but unfortunately cannot preview the file using the head command.
+Now we'll do this for the second metagenome.
+
+```{bash}
+/home/shared/16TB_HDD_01/fish546/renee/Prodigal/prodigal \
+  -i /home/shared/16TB_HDD_01/fish546/renee/build/megahit_F1B_KM40_out/final.contigs.fa \  # input FASTA file of assembled contigs
+  -a /home/shared/16TB_HDD_01/fish546/renee/build/megahit_F1B_KM40_out/predicted_proteins.faa \  # output amino acid sequences (for HMMER screening)
+  -d /home/shared/16TB_HDD_01/fish546/renee/build/megahit_F1B_KM40_out/predicted_nucleotides.fna \
+  -o /home/shared/16TB_HDD_01/fish546/renee/build/megahit_F1B_KM40_out/prodigal_output.gbk \
+  -f gbk \  #format of output file, GenBank format
+  -p meta. #mode optimized for metagenomic data
+```
+
+Now we have 2 protein fasta files that we can use for a HMMER search.
+
+### HMMER
+
+I searched the protein fasta files for specific HMMs.
+To do this, I downloaded the HMM files from the NCBI accession pages in the previous section, then uploaded them to Raven via scp command.
+Before we run a search, I needed to index the .hmm files.
+
+```{bash}
+cd /home/shared/16TB_HDD_01/fish546/renee/hmm_profiles/
+hmmpress nifH.hmm
+hmmpress nifD.hmm
+hmmpress nifK.hmm
+```
+
+Then I was ready to start searching the F2R protein fasta.
+
+```{bash}
+hmmsearch --tblout output/nif_results/F2R/nifH.tbl \
+  --cpu 4 \
+  /home/shared/16TB_HDD_01/fish546/renee/hmm_profiles/nifH.hmm \
+  /home/shared/16TB_HDD_01/fish546/renee/build/megahit_F2R_KM41_out/predicted_proteins.faa
+
+hmmsearch --tblout output//nif_results/F2R/nifD.tbl \
+  --cpu 4 \
+  /home/shared/16TB_HDD_01/fish546/renee/hmm_profiles/nifD.hmm \
+  /home/shared/16TB_HDD_01/fish546/renee/build/megahit_F2R_KM41_out/predicted_proteins.faa
+
+hmmsearch --tblout output//nif_results/F2R/nifK.tbl \
+  --cpu 4 \
+  /home/shared/16TB_HDD_01/fish546/renee/hmm_profiles/nifK.hmm \
+  /home/shared/16TB_HDD_01/fish546/renee/build/megahit_F2R_KM41_out/predicted_proteins.faa
+```
+
+Now we will repeat the same commands for F1B.
+
+```{bash}
+hmmsearch --tblout output/nif_results/F1B/nifH.tbl \
+  --cpu 4 \
+  /home/shared/16TB_HDD_01/fish546/renee/hmm_profiles/nifH.hmm \
+  /home/shared/16TB_HDD_01/fish546/renee/build/megahit_F1B_KM40_out/predicted_proteins.faa
+
+hmmsearch --tblout output//nif_results/F1B/nifD.tbl \
+  --cpu 4 \
+  /home/shared/16TB_HDD_01/fish546/renee/hmm_profiles/nifD.hmm \
+  /home/shared/16TB_HDD_01/fish546/renee/build/megahit_F1B_KM40_out/predicted_proteins.faa
+
+hmmsearch --tblout output//nif_results/F1B/nifK.tbl \
+  --cpu 4 \
+  /home/shared/16TB_HDD_01/fish546/renee/hmm_profiles/nifK.hmm \
+  /home/shared/16TB_HDD_01/fish546/renee/build/megahit_F1B_KM40_out/predicted_proteins.faa
+```
+
+## Visualizing *nif* gene hits
+
+We can vizualize the number of hits of *nif* genes across the samples using a simple bar graph.
+We will keep the 0 counts for *nif*D and *nif*K in the interest of a complete data presentation.
+
+```{r,eval=TRUE}
+# Load libraries
+library(tidyverse)
+library(ggplot2)
+
+# paths to .tbl files
+tbl_files <- list(
+  F1B_nifH = "output/nif_results/F1B/nifH.tbl",
+  F1B_nifD = "output/nif_results/F1B/nifD.tbl",
+  F1B_nifK = "output/nif_results/F1B/nifK.tbl",
+  F2R_nifH = "output/nif_results/F2R/nifH.tbl",
+  F2R_nifD = "output/nif_results/F2R/nifD.tbl",
+  F2R_nifK = "output/nif_results/F2R/nifK.tbl"
+)
+
+# parse tblout and count hits
+parse_tbl <- function(file, sample, gene) {
+  lines <- readLines(file)
+  data_lines <- lines[!grepl("^#", lines)]  # Remove comment lines
+  n_hits <- length(data_lines)  # Count non-comment lines
+  tibble(sample = sample, gene = gene, hits = n_hits)
+}
+
+# making a data frame
+results <- bind_rows(
+  parse_tbl(tbl_files$F1B_nifH, "F1B", "nifH"),
+  parse_tbl(tbl_files$F1B_nifD, "F1B", "nifD"),
+  parse_tbl(tbl_files$F1B_nifK, "F1B", "nifK"),
+  parse_tbl(tbl_files$F2R_nifH, "F2R", "nifH"),
+  parse_tbl(tbl_files$F2R_nifD, "F2R", "nifD"),
+  parse_tbl(tbl_files$F2R_nifK, "F2R", "nifK")
+)
+
+# simple barplot of gene hits per sample
+ggplot(results, aes(x = gene, y = hits, fill = sample)) +
+  geom_col(position = position_dodge()) +
+  labs(title = "Nitrogenase Gene Hits per Metagenome",
+       x = "Gene",
+       y = "Number of Hits") +
+  theme_minimal()
+```
+
 # Conclusions
+
+-   no nifD or nifK
+
+-   slightly more nif genes in the rhizosphere than bulk soil
+
+-   detected taxa are known diazotrophs
+
+# Next steps: scaling up
+
+### Data integrity and QC
+
+### Preprocessing
+
+### Assembly
+
+### Metagenome comparisons
+
+### *nif* gene analysis
 
 # References
 
@@ -649,6 +825,29 @@ Genome Res. 2007 Mar;17(3):377-86.
 doi: 10.1101/gr.5969107.
 Epub 2007 Jan 25.
 PMID: 17255551; PMCID: PMC1800929.
+
+Hyatt, D., Chen, GL., LoCascio, P.F.
+et al.
+Prodigal: prokaryotic gene recognition and translation initiation site identification.
+BMC Bioinformatics 11, 119 (2010).
+https://doi.org/10.1186/1471-2105-11-119
+
+NFixDB (Nitrogen Fixation DataBase) - A Comprehensive Integrated Database for Robust 'Omics Analysis of Diazotrophs.
+(preprint)
+
+Masuda Y, Mise K, Xu Z, Zhang Z, Shiratori Y, Senoo K, Itoh H.
+2024.
+Global soil metagenomics reveals distribution and predominance of Deltaproteobacteria in nitrogen-fixing microbiome.
+Microbiome.
+12(1):95.
+doi:[10.1186/s40168-024-01812-1](https://doi.org/10.1186/s40168-024-01812-1).
+
+Song Z-Q, Wang L, Liang F, Zhou Q, Pei D, Jiang H, Li W-J.
+2022.
+nifH gene expression and diversity in geothermal springs of Tengchong, China.
+Front Microbiol.
+13:980924.
+doi:[10.3389/fmicb.2022.980924](https://doi.org/10.3389/fmicb.2022.980924).
 
 Thomas T, Gilbert J, Meyer F. Metagenomics - a guide from sampling to data analysis.
 Microb Inform Exp. 2012 Feb 9;2(1):3.
