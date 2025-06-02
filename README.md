@@ -6,13 +6,13 @@
 
 BioBead enables precise, tunable inoculation strategies in ecological restoration and sustainable agriculture. Each bead can be customized to deliver targeted microbial consortia.
 
-We are analyzing the metagenomes from 2 soil samples that were used in a greenhouse study prior to biofertilizer treatment. These will give us a sense of resident microbial (fungal and bacterial) communities residing in them.
+We are analyzing the metagenomes from 2 (out of 48) soil samples that were used in a greenhouse study prior to biofertilizer treatment. These will give us a sense of resident microbial (fungal and bacterial) communities residing in them.
 
 -   F1B-KM40 - bulk field soil
 
 -   F2R-KM41 - rhizosphere soil
 
-The goal is to generate phylogenetic trees of bacteria and fungi in these samples.
+The goal is to generate phylogenetic trees of bacteria and fungi in these samples, and analyze them for nitrogenase gene (nif) abundance. We expect there to be a more diverse commmunity of microbes in the rhizosphere (root zone), and for there to be more nif gene activity. 
 
 ## 🔬 Current focus areas
 
@@ -20,9 +20,8 @@ Characterizing microbial activity across soil types and host plant interfaces us
 
 ## ⚙️ Technologies used
 
--   Alginate-based encapsulation
--   Fungal and bacterial co-culture
--   Microscopy, FISH, and bioinformatics tools (e.g., PEAR, Megahit, Megan)
+-   Alginate-based encapsulation with fungal and bacterial consortia
+-   Microscopy, FISH, and bioinformatics tools (e.g., PEAR, Megahit, Megan, HMMER, Prodigal)
 
 ## 🚧 Status
 
