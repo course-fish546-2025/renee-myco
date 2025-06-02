@@ -12,7 +12,7 @@ We are analyzing the metagenomes from 2 (out of 48) soil samples that were used 
 
 -   F2R-KM41 - rhizosphere soil
 
-The goal is to generate phylogenetic trees of bacteria and fungi in these samples, and analyze them for nitrogenase gene (nif) abundance. We expect there to be a more diverse commmunity of microbes in the rhizosphere (root zone), and for there to be more nif gene activity. 
+The goal is to generate phylogenetic trees of bacteria and fungi in these samples, and analyze them for nitrogenase gene (_nif_) abundance. We expect there to be a more diverse commmunity of microbes in the rhizosphere (root zone), and for there to be more _nif_ gene activity. 
 
 ## 🔬 Current focus areas
 
@@ -28,3 +28,4 @@ Characterizing microbial activity across soil types and host plant interfaces us
 This repository serves as an open, evolving pipeline for metagenome analysis of greenhouse soil samples from BioBead trials.
 
 See slide deck here: <https://rpubs.com/reneedavis/metagenomes>
+R pubs compendium link: <http://rpubs.com/reneedavis/1311624>
