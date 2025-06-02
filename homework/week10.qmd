@@ -1,0 +1,29 @@
+---
+title: "week10"
+format: html
+---
+
+# Looking back on the quarter what are two things you were not expecting to learn but did, glad you did, and how would you implement this knowledge beyond this class?
+
+1.  I finally know how to install things from GitHub. I know, it's super basic. But getting a hang of this has really opened up a world that was previously very opaque to me.
+2.  Qmd documents and slides. This whole publishing system has rocked my world. I am so stoked to continue working on these platforms. I've shown almost everyone in my lab.
+
+# Rank the following from 1-5, with 1 being your best friend and 5 being your enemy (raven, rstudio, knitr, bash, github)
+
+-   Raven - 3
+
+-   Rstudio - 2
+
+-   Knitr - 4
+
+-   Bash - 3
+
+-   GitHub - 2
+
+# As part of your research project you must of learned something beyond methods. What is the most important biological finding from your work to to date? Assuming you follow this line of research what is your long term goal of what you expect to learn about biology, ecology, or the environment?
+
+It's extremely cool to see more nif gene activity in rhizosphere soil samples. That's generally expected, but it's different when you're doing the analysis. I was a little surprised to see that the taxa were mostly shared across samples. I expected a little more divergence. Alpha, beta, and proteobacteria are pretty expected. It was super cool to see some fungi in there though! I am going to dig into those results more after class.
+
+My long term goal in this line of research is to help commercialize BioBead and enhance nitrogen cycling in soils for regenerative agriculture. But I ultimately want to apply this knowledge to mycoheterotrophs, a special group of plants that grown from soil fungi (and don't photosynthesize). Some N-fixing diazotrophs have been located in the root systems of these plants, which points to their having a unique role in soil ecosystems. I'd love to shine a light on that more.
+
+Seriously, this has been the coolest class. Learning bioinformatics has been a goal of mine for many, many years. I always felt like I would "make it" if I knew these skills. It really grew my confidence and I'm excited to keep on this path. Thank you so much, for everything.
