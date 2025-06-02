@@ -135,7 +135,7 @@ I need to trim raw data to remove adapters and low-quality bases.
 It's important to do this prior to merging, as merging reads relies on the overlapping region between forward and reverse reads.
 If I try to merge before trimming, I could end up with incorrect overlaps, low quality merges, and related issues.
 
-For this step we will use [Trimmomatic](#0), which I will had to install.
+For this I used [Trimmomatic](#0), which required installation.
 
 ```{bash}
 scp -r ~/Downloads/Trimmomatic-0.39 rendavis@raven.fish.washington.edu:/home/shared/16TB_HDD_01/fish546/renee  #from the local terminal
@@ -651,7 +651,7 @@ We will need to use some annotation tools to screen for *nif* genes in our sampl
 -   *nif*K: [NCBI HMM accession TIGR01286.1](https://www.ncbi.nlm.nih.gov/genome/annotation_prok/evidence/TIGR01286/)
 -   *nif*D: [NCBI HMM accession TIGR01282.1](https://www.ncbi.nlm.nih.gov/genome/annotation_prok/evidence/TIGR01282/)
 
-To do this, we will use a tool called HMMER to search sequence databases for sequence homologs like nif genes.
+To do this, we will use a tool called HMMER to search sequence databases for sequence homologs like *nif* genes.
 It uses probabilistic models called profile hidden Markov models (profile HMMs).
 
 ## *nif* gene activity between samples
@@ -807,6 +807,8 @@ ggplot(results, aes(x = gene, y = hits, fill = sample)) +
 ### Metagenome comparisons
 
 ### *nif* gene analysis
+
+[![](https://zenodo.org/badge/DOI/10.5281/zenodo.15576214.svg){alt="DOI"}](#0)
 
 # References
 
