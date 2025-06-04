@@ -20,7 +20,7 @@ I analyzed the metagenomes from 2 (of 48) soil samples that were used a greenhou
 -   F1B - bulk field soil
 -   F2R - rhizosphere (root space) soil
 
-The goal is to identify the microbial communities, analyze taxa, screen for nitrogenase genes, and establish a pipeline for analyzing the rest of the samples for functional insights.
+The goal is to identify the microbial communities, analyze taxa, screen for nitrogenase genes, and establish a pipeline.
 
 ## BioBead project
 
@@ -313,7 +313,7 @@ ggplot(scatter_data, aes(x = F1B, y = F2R, color = shared_status)) +
 
 ## *nif* gene analysis
 
-![Rubio LM, Ludden PW. 2008. Biosynthesis of the Iron-Molybdenum Cofactor of Nitrogenase. doi:10.1146/annurev.micro.62.081307.162737.](06-presentation_files/Nitrogen-fixation-nif-gene-cluster-of-Klebsiella-pneumoniae-Genes-encoding-the_W640.jpg){width="1300"}
+![Rubio LM, Ludden PW. 2008. Biosynthesis of the Iron-Molybdenum Cofactor of Nitrogenase. doi:10.1146/annurev.micro.62.081307.162737.](images/Nitrogen-fixation-nif-gene-cluster-of-Klebsiella-pneumoniae-Genes-encoding-the_W640.jpg){width="2000"}
 
 1.  get HMM profiles of 3 nif genes from NCBI
 
@@ -432,4 +432,4 @@ ggplot(results, aes(x = gene, y = hits, fill = sample)) +
 
 -   Get into PCAs/other analyses TBD
 
-Q: Raven access? Or do this all on Hyak?
+Run on Hyak and utilizing bash scripting to manage the large number of files.

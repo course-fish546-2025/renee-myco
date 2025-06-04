@@ -589,7 +589,7 @@ venn.plot <- draw.pairwise.venn(
 )
 
 # save to PDF
-pdf("taxa_venn_diagram.pdf")
+pdf("images/taxa_venn_diagram.pdf")
 grid.draw(venn.plot)
 dev.off()
 
@@ -618,7 +618,7 @@ ggplot(scatter_data, aes(x = F1B, y = F2R, color = shared_status)) +
   theme_minimal()
 
 # save scatter plot
-ggsave("taxa_abundance_comparison.png", width = 8, height = 6)
+ggsave("images/taxa_abundance_comparison.png", width = 8, height = 6)
 ```
 
 # Analysis of nitrogenase gene clusters
