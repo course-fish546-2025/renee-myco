@@ -1,0 +1,24 @@
+#                                                                --- full sequence ---- --- best 1 domain ---- --- domain number estimation ----
+# target name        accession  query name           accession     E-value  score  bias   E-value  score  bias   exp reg clu  ov env dom rep inc description of target
+#------------------- ---------- --------------------  ---------- --------- ------ ----- --------- ------ -----   --- --- --- --- --- --- --- --- ---------------------
+k141_29603_1         -          nifH                 TIGR01287.1   9.2e-07   28.4   0.0   1.2e-06   28.0   0.0   1.2   1   0   0   1   1   1   1 # 2 # 583 # -1 # ID=7443_1;partial=11;start_type=Edge;rbs_motif=None;rbs_spacer=None;gc_cont=0.624
+k141_16380_1         -          nifH                 TIGR01287.1   1.2e-05   24.8   0.1   2.7e-05   23.6   0.1   1.5   1   1   1   2   2   2   1 # 3 # 281 # -1 # ID=8951_1;partial=10;start_type=ATG;rbs_motif=None;rbs_spacer=None;gc_cont=0.685
+k141_31919_1         -          nifH                 TIGR01287.1   0.00013   21.4   0.0   0.00019   20.8   0.0   1.3   1   0   0   1   1   1   1 # 1 # 273 # -1 # ID=230_1;partial=10;start_type=ATG;rbs_motif=GGA/GAG/AGG;rbs_spacer=5-10bp;gc_cont=0.538
+k141_8089_1          -          nifH                 TIGR01287.1    0.0025   17.2   0.0    0.0028   17.0   0.0   1.1   1   0   0   1   1   1   1 # 1 # 279 # 1 # ID=11430_1;partial=10;start_type=Edge;rbs_motif=None;rbs_spacer=None;gc_cont=0.695
+k141_5012_1          -          nifH                 TIGR01287.1    0.0098   15.2   0.0     0.013   14.8   0.0   1.2   1   0   0   1   1   1   1 # 1 # 564 # 1 # ID=1530_1;partial=11;start_type=Edge;rbs_motif=None;rbs_spacer=None;gc_cont=0.644
+k141_33815_2         -          nifH                 TIGR01287.1     0.012   15.0   0.0     0.014   14.7   0.0   1.0   1   0   0   1   1   1   0 # 124 # 645 # -1 # ID=6267_2;partial=01;start_type=Edge;rbs_motif=None;rbs_spacer=None;gc_cont=0.638
+k141_8255_1          -          nifH                 TIGR01287.1     0.014   14.7   0.2     0.018   14.3   0.2   1.1   1   0   0   1   1   1   0 # 1 # 531 # -1 # ID=11944_1;partial=10;start_type=ATG;rbs_motif=AGxAGG/AGGxGG;rbs_spacer=5-10bp;gc_cont=0.548
+k141_34326_2         -          nifH                 TIGR01287.1      0.03   13.6   0.0     0.033   13.5   0.0   1.0   1   0   0   1   1   1   0 # 184 # 576 # -1 # ID=7882_2;partial=01;start_type=Edge;rbs_motif=None;rbs_spacer=None;gc_cont=0.718
+k141_33239_1         -          nifH                 TIGR01287.1     0.052   12.8   0.0     0.077   12.3   0.0   1.2   1   0   0   1   1   1   0 # 1 # 585 # -1 # ID=4455_1;partial=11;start_type=Edge;rbs_motif=None;rbs_spacer=None;gc_cont=0.709
+k141_12639_2         -          nifH                 TIGR01287.1     0.075   12.3   0.1     0.078   12.3   0.1   1.0   1   0   0   1   1   1   0 # 386 # 511 # 1 # ID=11339_2;partial=01;start_type=ATG;rbs_motif=GGA/GAG/AGG;rbs_spacer=5-10bp;gc_cont=0.690
+k141_26685_1         -          nifH                 TIGR01287.1      0.11   11.8   0.0      0.17   11.1   0.0   1.3   1   1   0   1   1   1   0 # 3 # 377 # 1 # ID=12662_1;partial=10;start_type=Edge;rbs_motif=None;rbs_spacer=None;gc_cont=0.653
+#
+# Program:         hmmsearch
+# Version:         3.1b2 (February 2015)
+# Pipeline mode:   SEARCH
+# Query file:      /home/shared/16TB_HDD_01/fish546/renee/hmm_profiles/nifH.hmm
+# Target file:     /home/shared/16TB_HDD_01/fish546/renee/build/megahit_F1B_KM40_out/predicted_proteins.faa
+# Option settings: hmmsearch --tblout output/nif_results/F1B/nifH.tbl --cpu 4 /home/shared/16TB_HDD_01/fish546/renee/hmm_profiles/nifH.hmm /home/shared/16TB_HDD_01/fish546/renee/build/megahit_F1B_KM40_out/predicted_proteins.faa 
+# Current dir:     /home/shared/8TB_HDD_02/rendavis/renee-myco/project
+# Date:            Sun Jun  1 18:17:33 2025
+# [ok]

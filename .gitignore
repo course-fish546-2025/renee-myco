@@ -7,11 +7,10 @@
 # Ignore large files
 assignments/data/*
 assignments/output/*
-project/megahit/*
-project/build/*
-project/output/*
-rna.fna
-
-data/*fast*
-
+project/output/f1b_species.txt
+project/output/f2r_species.txt
 project/data/*
+
+# Probably not needed but scared to remove
+rna.fna
+data/*fast*

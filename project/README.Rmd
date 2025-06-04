@@ -1,8 +1,0 @@
-My PhD project is on "BioBead" - biodegradable hydrogels containing fungal and bacterial consortia for soil health. The fungi are specifically arbuscular mycorrhizal fungi and the bacteria are nitrogen fixing and phosphorous solubilizing species. 
-
-This bioinformatics project will compare 2 metagenomes of fungi and bacteria from 2 soil samples from a greenhouse study. The greenhouse study of BioBead treatment of wheat plants was completed in Nov 2023. These 2 samples are the 'blanks' - the native soils in which BioBeads were applied. 
-
-F1B - bulk native soil
-F2R - rhizosphere native soil
-
-It is known that rhizosphere (soil area surrounding the rootspace) contain most of the microbes in soils (CEWA 540 lecture 3. This project will test that concept in the context of this greenhouse study. 

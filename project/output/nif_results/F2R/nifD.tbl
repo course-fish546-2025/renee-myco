@@ -1,0 +1,13 @@
+#                                                                --- full sequence ---- --- best 1 domain ---- --- domain number estimation ----
+# target name        accession  query name           accession     E-value  score  bias   E-value  score  bias   exp reg clu  ov env dom rep inc description of target
+#------------------- ---------- --------------------  ---------- --------- ------ ----- --------- ------ -----   --- --- --- --- --- --- --- --- ---------------------
+#
+# Program:         hmmsearch
+# Version:         3.1b2 (February 2015)
+# Pipeline mode:   SEARCH
+# Query file:      /home/shared/16TB_HDD_01/fish546/renee/hmm_profiles/nifD.hmm
+# Target file:     /home/shared/16TB_HDD_01/fish546/renee/build/megahit_F2R_KM41_out/predicted_proteins.faa
+# Option settings: hmmsearch --tblout output//nif_results/F2R/nifD.tbl --cpu 4 /home/shared/16TB_HDD_01/fish546/renee/hmm_profiles/nifD.hmm /home/shared/16TB_HDD_01/fish546/renee/build/megahit_F2R_KM41_out/predicted_proteins.faa 
+# Current dir:     /home/shared/8TB_HDD_02/rendavis/renee-myco/project
+# Date:            Sun Jun  1 18:19:48 2025
+# [ok]

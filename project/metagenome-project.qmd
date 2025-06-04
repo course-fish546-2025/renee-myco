@@ -1,5 +1,5 @@
 ---
-title: "Soil metagenome project"
+title: "NifHunt: Soil metagenome N fixation analysis from BioBead greenhouse study"
 format: html
 toc: true
 editor: 
@@ -10,29 +10,34 @@ execute:
   engine: knitr
 ---
 
-![](06-presentation_files/vanburn-gonsalves-S6IalhfacLY-unsplash.jpg)
+![](images/vanburn-gonsalves-S6IalhfacLY-unsplash.jpg)
 
 # Introduction
 
 Soil microbial ecology is complex and its composition depends on several factors.
-Soil microbial communits are found in higher concentrations in the rhizosphere, or root space.
+Soil microbial communities are found in higher concentrations in the rhizosphere, or root space.
 Plant roots provide carbohydrates and niches for microbes to flourish.
 Some of these microbes fix nitrogen, solubilize phosphorous, and perform other necessary activities.
-Additionally, mutualistic mycorrhizal fungi also provide structures for microbial residence and travel.
+Additionally, mutualistic mycorrhizal fungi provide structures for microbial residence and travel.
 Together, these underground dynamics boost soil carbon and nitrogen, further supporting plant growth and driving these biophilic cycles.
-However, anthropogenic disturbances like tilling and synthetic fertilizer use create soil dysbiosis and farm this ecological balance.
-BioBead is an innovative biodegradable hydrogel containing microbial consortia for soil health, addressing multiple factors in nutrient cycling and soil health.
+However, anthropogenic disturbances like tilling and synthetic fertilizer use create soil dysbiosis and harm this ecological balance.
 
-For this study, I analyzed the metagenomes from 2 (out of 48) soil samples from a recent BioBead greenhouse trial with wheat plants.
-These will give me a sense of resident microbial (fungal and bacterial) communities prior to treatment BioBead, conventional fertilizer, and others.
+BioBead is an innovative biodegradable hydrogel format containing microbial consortia, addressing multiple factors in nutrient cycling and soil health.
+Greenhouse studies with BioBead have demonstrated improved growth for tomatoes and wheat plants, increases in soil organic matter, and promotion of closed nutrient cycling.
+
+For this study, I analyzed the metagenomes from 2 (out of 48) soil samples from one of the recent BioBead greenhouse trials with wheat plants (led by Korena Mafune PhD).
+These soils were sourced from a nearby farm, with half of the treatments utilizing sterilized soil, and half with untreated soil.
+The reason for this split design is to understand how soil inoculations perform with native soil microbes compared to sterile soil environments.
+Analyzing these metagenomes will provide a sense of resident microbial (fungal and bacterial) communities prior to treatment BioBead, conventional fertilizer, and other interventions.
 
 1.  F1B - bulk field soil
-2.  F2R - rhizosphere soil
+2.  F2R - rhizosphere (root space) soil
 
-The soil samples were collected at the end of experiment from each treatment, and the DNA was extracted with Qiagen DNAEasy PowerSoil kits.
+The soil samples were collected from each treatment at the end of experiment.
+The DNA was extracted with Qiagen DNAEasy PowerSoil kits.
 Shotgun metagenome sequencing was provided by Eurofins Genomics.
 
-The purpose of this exercise is to understand shared vs unique taxa in each sample, and screen for the presence of nitrogenase genes.
+The purpose of this exercise is to understand shared vs unique taxa in each sample, and screen for the presence of nitrogenase genes (specifically, the 3 subunits. *nif*H, *nif*D, *nif*K that form the nitrogenase complex).
 These are important, as organisms that fix nitrogen to the soil reduce the need for synthetic fertilizer input.
 I expect there to be a more diverse microbial community in the rhizosphere soil sample sample over the bulk one.
 Additionally, I expect to find more *nif* gene abundance in the rhizosphere sample.
@@ -40,19 +45,9 @@ If this pipeline is effective, it will be scaled to analyze the entire 48 metage
 
 # Data upload
 
-To begin, I will upload a raw fastq file to Raven server.
-(Note that this needs to be done from the local terminal, not the server.)
+Raw fastq files were uploaded to Raven server using rsync.
 
 ```{bash}
-# move files from lab drive to Raven
-scp "/Volumes/CRUZER16GB/F1B-KM40_R1_001.fastq.gz" \
-rendavis@raven.fish.washington.edu:/home/shared/16TB_HDD_01/fish546/renee/
-```
-
-Once successful, I uploaded the rest using rsync instead (better for handling multiple files, fewer chances of duplicates, conflicts etc).
-
-```{bash}
-# move remaining files from lab drive to Raven
 rsync -av --progress \
     /Volumes/CRUZER16GB/*.fastq.gz \
     rendavis@raven.fish.washington.edu:/home/shared/16TB_HDD_01/fish546/renee/
@@ -62,7 +57,7 @@ rsync -av --progress \
 
 ## Checksums
 
-Before I began working, I ran a MD5 check on the 4 metagenome fastq files.
+I ran a MD5 check on the 4 metagenome fastq files.
 
 ```{bash}
 find . -type f -exec md5sum-lite {} \; >> output.txt  #found all files in the working directory, calculated its MD5 checksum, save to an output txt file
@@ -74,7 +69,6 @@ Here is the output:
 ```         
 b24ae50750964ef8d01a8808051c73c7  ./F2R-KM41_R2_001.fastq.gz
 a48a5ad0bc4ce07f641c0c647fe0dbaf  ./F1B-KM40_R2_001.fastq.gz
-88d5e83290598639d54218bc505bfe66  ./output.txt
 a8be224ab035ea641ccd5a8c9d46c024  ./F2R-KM41_R1_001.fastq.gz
 e34585c824e429f54ff34d919719f1c4  ./F1B-KM40_R1_001.fastq.gz
 ```
@@ -83,7 +77,7 @@ e34585c824e429f54ff34d919719f1c4  ./F1B-KM40_R1_001.fastq.gz
 mv output.txt md5checksums_metagenomes_2025.txt #renamed the file to something more descriptive
 ```
 
-To validate file integrity later, one could run the following code to ensure a match.
+To validate file integrity later, the following code could be run to ensure a match.
 
 ```{bash}
 md5sum -c md5checksums_metagenomes_2025.txt
@@ -93,8 +87,7 @@ md5sum -c md5checksums_metagenomes_2025.txt
 
 ### FastQC
 
-I have been told that QC has been run on these, but we won't take that at face value.
-For this I will use FastQC.
+I have been told that QC has been run on these, but will verify this using FastQC.
 
 ```{bash}
 # run FastQC on the fastq files
@@ -107,8 +100,6 @@ Analysis complete for F2R-KM41_R2_001.fastq.gz
 Analysis complete for F1B-KM40_R1_001.fastq.gz
 Analysis complete for F1B-KM40_R2_001.fastq.gz
 ```
-
-The .png files were downloaded to my desktop.
 
 ### MultiQC
 
@@ -147,7 +138,8 @@ I'll do this in 2 steps with F1B R1/R2 and then F2R R1/R2.
 
 ```{bash}
 cd /home/shared/16TB_HDD_01/fish546/renee
-java -jar /home/shared/16TB_HDD_01/fish546/renee/Trimmomatic-0.39/trimmomatic-0.39.jar PE -threads 4 \
+java -jar /home/shared/16TB_HDD_01/fish546/renee/Trimmomatic-0.39/trimmomatic-0.39.jar PE #PE = Paired-End mode
+-threads 4 \
   F1B-KM40_R1_001.fastq.gz F1B-KM40_R2_001.fastq.gz \
   F1B-KM40_trimmed_R1_paired.fastq.gz F1B-KM40_trimmed_R1_unpaired.fastq.gz \
   F1B-KM40_trimmed_R2_paired.fastq.gz F1B-KM40_trimmed_R2_unpaired.fastq.gz \
@@ -308,7 +300,7 @@ As a final step, we'll preview the file and do a quality check on the merged fil
 /home/shared/FastQC-0.12.1/fastqc -t 36 -o output /home/shared/16TB_HDD_01/fish546/renee/*merged.fastq.gz
 ```
 
-HTML report results: [F1B-KM40_merged.fastq.gz](http://raven.fish.washington.edu:8787/files/renee-myco/project/output/F1B-KM40_merged_fastqc.html); [F2R-KM41_merged.fastq.gz](http://raven.fish.washington.edu:8787/files/renee-myco/project/output/F2R-KM41_merged_fastqc.html).
+HTML report results: F1B-KM40_merged.fastq.gz; F2R-KM41_merged.fastq.gz.
 F1B has higher per base sequence quality, but both look good.
 
 # Assembly using MEGAHIT
@@ -357,8 +349,6 @@ cd /home/shared/16TB_HDD_01/fish546/renee/build
   -t 8
 ```
 
-Each run took 120 minutes.
-
 ### File check
 
 I want to see a text file when we check files using the head command.
@@ -391,22 +381,16 @@ Finally, we have the contig length.
 
 # Phylogenetic trees using Megan
 
+## F2R - rhizosphere soil
+
 MEGAN is a program that graphs the taxonomical content from metagenomic data sets.
-To start, I'll read in files.
-
-```{bash}
-ls /home/shared/16TB_HDD_01/fish546/renee/
-```
-
-## F2R - rhizospheric soil
-
-Then we will query Diamond BLAST with the rhizospheric soil metagenome.
+To start, I'll query Diamond BLAST with the rhizospheric soil metagenome fastq file.
 
 ```{bash}
     /home/shared/diamond-2.1.8 blastx \
     --db /home/shared/16TB_HDD_01/sam/databases/blastdbs/ncbi-nr-20250429.dmnd \
     --query /home/shared/16TB_HDD_01/fish546/renee/F2R-KM41_merged.fastq.gz \
-    --out output/sr-blastx.daa \
+    --out data/sr-blastx-f2r.daa \
     --outfmt 100 \
     --top 5 \
     --block-size 15.0 \
@@ -416,22 +400,20 @@ Then we will query Diamond BLAST with the rhizospheric soil metagenome.
 
 ```{bash}
     /home/shared/megan-6.24.20/tools/daa-meganizer \
-    --in output/sr-blastx.daa \
+    --in data/sr-blastx-f2r.daa \
     --threads 32 \
-    --mapDB /home/shared/16TB_HDD_01/sr320/github/renee-myco/project/data/megan-map-Feb2022.db
+    --mapDB /home/shared/16TB_HDD_01/sr320/github/renee-myco/project/data/megan-map-Feb2022.db #this is the taxonomy database file, updated Feb 2022
 ```
 
 ```{bash}
 /home/shared/megan-6.24.20/tools/daa2rma \
---in output/sr-blastx.daa \
+--in output/sr-blastx-f2r.daa \
 --mapDB /home/shared/16TB_HDD_01/sr320/github/renee-myco/project/data/megan-map-Feb2022.db \
---out output/sr-blastx-meganized.rma6 \
+--out data/sr-blastx-meganized.rma6 \
 --threads 40 2>&1 | tee --append output/daa2rma_log.txt
 ```
 
-The tree can be viewed here:
-
-![](F2R-phylo.pdf)
+The tree can be viewed here.
 
 A total of 1002 taxa were detected.
 The top hits include *Acidobacteria bacterium, Actinobacteria bacterium, Chloroflexi bacterium, Verrucomicrobia bacterium.* (All are bacteria.) Genera of fungi detected include: *Mortierellaceae, Diversisporales, Paraglomus, Rhizophagus, Metarhizium*.
@@ -472,9 +454,7 @@ This produces a .rma file that can be opened into MEGAN and the metadata used to
 --threads 40 2>&1 | tee --append output/daa2rma_log2.txt
 ```
 
-The tree can be viewed here:
-
-![](F1B-phylo.pdf)
+The tree can be viewed here.
 
 A total of 933 taxa were detected.
 The top hits include *Acidobacteria bacterium, Alphaproteobacteria bacterium, Betaproteobacteria bacterium, Deltaproteobacteria bacterium.* (All are bacteria.) Groups of fungi detected include: *Mortierellaceae, Diversisporales, Paraglomus, Rhizophagus, Aspergillaceae.*
@@ -484,7 +464,7 @@ Most soil microbes are located in the rhizosphere, so this is consistent with ou
 
 # Metagenome data comparison
 
-Now that I have assembled metagenomes and taxonomy, I want to know how these metagenomes compare to one another.
+Now that I have assembled metagenomes and taxonomy for each sample, I want to know how they compare.
 Specifically, I'm interested in what taxa they have in common and which are unique.
 
 I could export the data in Megan (.rma6 file) to a .txt, then convert the data into a common format like .xlsx or Google Sheets for comparison.
@@ -652,12 +632,12 @@ We will need to use some annotation tools to screen for *nif* genes in our sampl
 -   *nif*D: [NCBI HMM accession TIGR01282.1](https://www.ncbi.nlm.nih.gov/genome/annotation_prok/evidence/TIGR01282/)
 
 To do this, we will use a tool called HMMER to search sequence databases for sequence homologs like *nif* genes.
-It uses probabilistic models called profile hidden Markov models (profile HMMs).
+It uses probabilistic models called profile Hidden Markov models (profile HMMs).
 
 ## *nif* gene activity between samples
 
-In theory, we could use HMMER to get the number of nitrogenase genes directly from our contigs.fa files.
-But since nitrogenase genes are protein-coding, and HMMER works best on predicted proteins, raw nucleotide sequences like your contigs.fa are not ideal and could lead to false negatives.
+In theory, we could use HMMER to get the number of nitrogenase genes directly from our merged metagenome files.
+But since nitrogenase genes are protein-coding, and HMMER works best on predicted proteins, raw nucleotide sequences in our merged files are not ideal and could lead to false negatives.
 
 ### Prodigal for gene prediction
 
@@ -743,7 +723,7 @@ hmmsearch --tblout output//nif_results/F1B/nifK.tbl \
 
 ## Visualizing *nif* gene hits
 
-We can vizualize the number of hits of *nif* genes across the samples using a simple bar graph.
+We can visualize the number of hits of *nif* genes across the samples using a simple bar graph.
 We will keep the 0 counts for *nif*D and *nif*K in the interest of a complete data presentation.
 
 ```{r,eval=TRUE}
@@ -790,23 +770,31 @@ ggplot(results, aes(x = gene, y = hits, fill = sample)) +
 
 # Conclusions
 
--   no nifD or nifK
-
--   slightly more nif genes in the rhizosphere than bulk soil
-
--   detected taxa are known diazotrophs
+In this dataset, *nif*H was detected, but *nif*D and *nif*K were not.
+For a microbe to fix N, all 3 need to be present and active.
+This could reflect fragmented operons that were present in the community, but not fully assembled due to sequencing or assembly limitations.
+As a commonly used marker gene for N fixation, *nif*H tends to be more abundant and is also more prone to horizontal gene transfer, making it possible to detect it even in the absence of a complete nitrogenase operon.
+(It's also possible that *nif*H is retained in dormant or non-functional contexts.) For a fuller picture, screening for alternative nitrogenase genes such as vnfDHK and anfDHK may reveal additional diazotrophic potential.
+Also, current HMM profiles may fail to detect divergent *nif*D/K sequences, particularly if they differ substantially from their canonical forms.
+Interestingly, there were slightly more *nif* genes in rhizosphere samples than in bulk soil, and many of the top hits mapped to known diazotrophic taxa, supporting the ecological relevance of these findings.
 
 # Next steps: scaling up
 
-### Data integrity and QC
+Following the establishment of this initial pipeline, I am planning a scale up of the metagenome processing efforts from this greenhouse study.
 
-### Preprocessing
+-   Trim on Trimmomatic
 
-### Assembly
+-   Merge with fastp
 
-### Metagenome comparisons
+-   Assemble with Megahit
 
-### *nif* gene analysis
+-   Phylogeny with MEGAN
+
+-   Functional analysis with Prodigal and HMMER
+
+-   PCAs/other analyses (e.g. heat maps) as needed
+
+This would take place on the Hyak HPC cluter and utilize bash scripting (e.g. xargs) to support batch Unix commands.
 
 [![](https://zenodo.org/badge/DOI/10.5281/zenodo.15576214.svg){alt="DOI"}](#0)
 
