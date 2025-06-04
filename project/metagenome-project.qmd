@@ -35,7 +35,7 @@ Analyzing these metagenomes will provide a sense of resident microbial (fungal a
 
 The soil samples were collected from each treatment at the end of experiment.
 The DNA was extracted with Qiagen DNAEasy PowerSoil kits.
-Shotgun metagenome sequencing was provided by Eurofins Genomics.
+Shotgun metagenome sequencing was provided by Azenta.
 
 The purpose of this exercise is to understand shared vs unique taxa in each sample, and screen for the presence of nitrogenase genes (specifically, the 3 subunits. *nif*H, *nif*D, *nif*K that form the nitrogenase complex).
 These are important, as organisms that fix nitrogen to the soil reduce the need for synthetic fertilizer input.
