@@ -300,7 +300,7 @@ As a final step, we'll preview the file and do a quality check on the merged fil
 /home/shared/FastQC-0.12.1/fastqc -t 36 -o output /home/shared/16TB_HDD_01/fish546/renee/*merged.fastq.gz
 ```
 
-HTML report results: F1B-KM40_merged.fastq.gz; F2R-KM41_merged.fastq.gz.
+Here are the HTML report results for [F1B](https://github.com/course-fish546-2025/renee-myco/blob/main/project/output/fastqc/F1B-KM40_merged_fastqc.html) and [F2R](https://github.com/course-fish546-2025/renee-myco/blob/main/project/output/fastqc/F2R-KM41_merged_fastqc.html).
 F1B has higher per base sequence quality, but both look good.
 
 # Assembly using MEGAHIT
@@ -413,7 +413,7 @@ To start, I'll query Diamond BLAST with the rhizospheric soil metagenome fastq f
 --threads 40 2>&1 | tee --append output/daa2rma_log.txt
 ```
 
-The tree can be viewed here.
+[The tree can be viewed here.](https://github.com/course-fish546-2025/renee-myco/blob/main/project/output/F2R-phylo.pdf)
 
 A total of 1002 taxa were detected.
 The top hits include *Acidobacteria bacterium, Actinobacteria bacterium, Chloroflexi bacterium, Verrucomicrobia bacterium.* (All are bacteria.) Genera of fungi detected include: *Mortierellaceae, Diversisporales, Paraglomus, Rhizophagus, Metarhizium*.
@@ -454,7 +454,7 @@ This produces a .rma file that can be opened into MEGAN and the metadata used to
 --threads 40 2>&1 | tee --append output/daa2rma_log2.txt
 ```
 
-The tree can be viewed here.
+[The tree can be viewed here.](https://github.com/course-fish546-2025/renee-myco/blob/main/project/output/F1B-phylo.pdf)
 
 A total of 933 taxa were detected.
 The top hits include *Acidobacteria bacterium, Alphaproteobacteria bacterium, Betaproteobacteria bacterium, Deltaproteobacteria bacterium.* (All are bacteria.) Groups of fungi detected include: *Mortierellaceae, Diversisporales, Paraglomus, Rhizophagus, Aspergillaceae.*

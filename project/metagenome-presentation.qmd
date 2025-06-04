@@ -145,7 +145,7 @@ The final step is to convert the .daa files to .rma ones to use in the MEGAN GUI
 --threads 40 2>&1 | tee --append output/daa2rma_log.txt
 ```
 
-[Rhizosphere soil phylogenetic tree](https://github.com/course-fish546-2025/renee-myco/blob/main/project/F2R-phylo.pdf)
+[Rhizosphere soil phylogenetic tree](https://github.com/course-fish546-2025/renee-myco/blob/main/project/output/F2R-phylo.pdf)
 
 ## Rhizosphere soil top hits
 
