@@ -27,6 +27,6 @@ Characterizing microbial activity across soil types and host plant interfaces us
 
 This repository serves as an open, evolving pipeline for metagenome analysis of greenhouse soil samples from BioBead trials.
 
-See slide deck here: <https://rpubs.com/reneedavis/metagenomes>
+Slide deck: <https://rpubs.com/reneedavis/nifhunt>
 
-R pubs compendium link: <http://rpubs.com/reneedavis/1311624>
+Compendium: <http://rpubs.com/reneedavis/1311624>
