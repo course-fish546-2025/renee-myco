@@ -13,7 +13,7 @@ execute:
 
 ## Overview
 
-Nitrogen (N) fixation is a vital microbial process in soils. N-fixing microbes fox atmospheric N2 to a plant-usable form (NH3) via nitrogenase enzyme complex formed from genes *nif*H, *nif*D, *nif*K.
+Nitrogen (N) fixation is a vital microbial process in soils. N-fixing microbes fix atmospheric N2 to a plant-usable form (NH3) via nitrogenase enzyme complex formed from genes *nif*H, *nif*D, *nif*K.
 
 I analyzed the metagenomes from 2 (of 48) soil samples that were used a greenhouse study prior to BioBead treatment.
 
@@ -358,6 +358,17 @@ hmmsearch --tblout output//nif_results/F2R/nifK.tbl \
   /home/shared/16TB_HDD_01/fish546/renee/build/megahit_F2R_KM41_out/predicted_proteins.faa
 ```
 
+## nifH.tbl preview
+
+```         
+#                                                                --- full sequence ---- --- best 1 domain ---- --- domain number estimation ----
+# target name        accession  query name           accession     E-value  score  bias   E-value  score  bias   exp reg clu  ov env dom rep inc description of target
+#------------------- ---------- --------------------  ---------- --------- ------ ----- --------- ------ -----   --- --- --- --- --- --- --- --- ---------------------
+k141_2395_1          -          nifH                 TIGR01287.1   1.7e-08   33.9   0.1   2.5e-08   33.4   0.1   1.2   1   0   0   1   1   1   1 # 81 # 650 # 1 # ID=7481_1;partial=01;start_type=GTG;rbs_motif=None;rbs_spacer=None;gc_cont=0.630
+k141_11338_2         -          nifH                 TIGR01287.1   2.2e-07   30.3   0.0   2.5e-07   30.1   0.0   1.1   1   0   0   1   1   1   1 # 273 # 569 # 1 # ID=9864_2;partial=01;start_type=GTG;rbs_motif=GGA/GAG/AGG;rbs_spacer=11-12bp;gc_cont=0.687
+k141_19658_2
+```
+
 ## *nif* genes in metagenome samples
 
 ```{r,eval=TRUE}
@@ -406,7 +417,7 @@ ggplot(results, aes(x = gene, y = hits, fill = sample)) +
 
 -   *nif*H detected but no *nif*D or *nif*K
 
-    -   could be present but not assembled, operons
+    -   could be present but not assembled
 
     -   *nif*H is a marker gene and more abundant; also subject to HGT, operons or dormant
 

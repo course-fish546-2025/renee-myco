@@ -3155,7 +3155,7 @@ vertical-align: -.125em;
 <li>F1B - bulk field soil</li>
 <li>F2R - rhizosphere (root space) soil</li>
 </ol>
-<p>The soil samples were collected from each treatment at the end of experiment. The DNA was extracted with Qiagen DNAEasy PowerSoil kits. Shotgun metagenome sequencing was provided by Eurofins Genomics.</p>
+<p>The soil samples were collected from each treatment at the end of experiment. The DNA was extracted with Qiagen DNAEasy PowerSoil kits. Shotgun metagenome sequencing was provided by Azenta Life Sciences (GENEWIZ).</p>
 <p>The purpose of this exercise is to understand shared vs unique taxa in each sample, and screen for the presence of nitrogenase genes (specifically, the 3 subunits. <em>nif</em>H, <em>nif</em>D, <em>nif</em>K that form the nitrogenase complex). These are important, as organisms that fix nitrogen to the soil reduce the need for synthetic fertilizer input. I expect there to be a more diverse microbial community in the rhizosphere soil sample sample over the bulk one. Additionally, I expect to find more <em>nif</em> gene abundance in the rhizosphere sample. If this pipeline is effective, it will be scaled to analyze the entire 48 metagenome data set.</p>
 </section>
 <section id="data-upload" class="level1">
@@ -3370,7 +3370,7 @@ Read pairs merged: 6724249
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># run FastQC on the fastq files</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="ex">/home/shared/FastQC-0.12.1/fastqc</span> <span class="at">-t</span> 36 <span class="at">-o</span> output /home/shared/16TB_HDD_01/fish546/renee/<span class="pp">*</span>merged.fastq.gz</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>HTML report results: F1B-KM40_merged.fastq.gz; F2R-KM41_merged.fastq.gz. F1B has higher per base sequence quality, but both look good.</p>
+<p>Here are the HTML report results for <a href="https://github.com/course-fish546-2025/renee-myco/blob/main/project/output/fastqc/F1B-KM40_merged_fastqc.html">F1B</a> and <a href="https://github.com/course-fish546-2025/renee-myco/blob/main/project/output/fastqc/F2R-KM41_merged_fastqc.html">F2R</a>. F1B has higher per base sequence quality, but both look good.</p>
 </section>
 </section>
 <section id="assembly-using-megahit" class="level1">
@@ -3462,7 +3462,7 @@ GGGGAACGCGCGCGGACGCGGGAAGGCCGCCTTCAGGTCGAAC</code></pre>
 <span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>--out data/sr-blastx-meganized.rma6 <span class="dt">\</span></span>
 <span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>--threads 40 <span class="dv">2</span><span class="op">&gt;&amp;</span><span class="dv">1</span> <span class="kw">|</span> <span class="fu">tee</span> <span class="at">--append</span> output/daa2rma_log.txt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>The tree can be viewed here.</p>
+<p><a href="https://github.com/course-fish546-2025/renee-myco/blob/main/project/output/F2R-phylo.pdf">The tree can be viewed here.</a></p>
 <p>A total of 1002 taxa were detected. The top hits include <em>Acidobacteria bacterium, Actinobacteria bacterium, Chloroflexi bacterium, Verrucomicrobia bacterium.</em> (All are bacteria.) Genera of fungi detected include: <em>Mortierellaceae, Diversisporales, Paraglomus, Rhizophagus, Metarhizium</em>.</p>
 </section>
 <section id="f1b---bulk-field-soil" class="level2">
@@ -3494,7 +3494,7 @@ GGGGAACGCGCGCGGACGCGGGAAGGCCGCCTTCAGGTCGAAC</code></pre>
 <span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>--out output/sr-blastx-f1b.meganized.rma6 <span class="dt">\</span></span>
 <span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>--threads 40 <span class="dv">2</span><span class="op">&gt;&amp;</span><span class="dv">1</span> <span class="kw">|</span> <span class="fu">tee</span> <span class="at">--append</span> output/daa2rma_log2.txt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>The tree can be viewed here.</p>
+<p><a href="https://github.com/course-fish546-2025/renee-myco/blob/main/project/output/F1B-phylo.pdf">The tree can be viewed here.</a></p>
 <p>A total of 933 taxa were detected. The top hits include <em>Acidobacteria bacterium, Alphaproteobacteria bacterium, Betaproteobacteria bacterium, Deltaproteobacteria bacterium.</em> (All are bacteria.) Groups of fungi detected include: <em>Mortierellaceae, Diversisporales, Paraglomus, Rhizophagus, Aspergillaceae.</em></p>
 <p>While there are fewer taxa than in rhizosphere soil, the general composition seems to be similar. Most soil microbes are located in the rhizosphere, so this is consistent with our expectations.</p>
 </section>
@@ -3646,7 +3646,7 @@ dbl (2): F1B, F2R
 </div>
 </div>
 <div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co"># save to PDF</span></span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="fu">pdf</span>(<span class="st">&quot;taxa_venn_diagram.pdf&quot;</span>)</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="fu">pdf</span>(<span class="st">&quot;images/taxa_venn_diagram.pdf&quot;</span>)</span>
 <span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a><span class="fu">grid.draw</span>(venn.plot)</span>
 <span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a><span class="fu">dev.off</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -3690,7 +3690,7 @@ dbl (2): F1B, F2R
 </div>
 </div>
 <div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="co"># save scatter plot</span></span>
-<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">&quot;taxa_abundance_comparison.png&quot;</span>, <span class="at">width =</span> <span class="dv">8</span>, <span class="at">height =</span> <span class="dv">6</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">&quot;images/taxa_abundance_comparison.png&quot;</span>, <span class="at">width =</span> <span class="dv">8</span>, <span class="at">height =</span> <span class="dv">6</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning in scale_x_log10(): log-10 transformation introduced infinite values.
 log-10 transformation introduced infinite values.</code></pre>
