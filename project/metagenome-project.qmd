@@ -621,6 +621,16 @@ ggplot(scatter_data, aes(x = F1B, y = F2R, color = shared_status)) +
 ggsave("images/taxa_abundance_comparison.png", width = 8, height = 6)
 ```
 
+There is a discrepancy between the \~400 taxa captured by Taxize in R (and displayed in the Venn diagram and scatterplot) versus the number of taxa described by MEGAN.
+The most likely reasons are:
+
+1.  differences and issues in taxonomic name resolution - Taxize may not recognize a taxon if it is informal or incomplete (e.g., `"Bacteria_unclassified"`) or an environmental placeholder (e.g., `"Candidatus Solibacter"`).
+2.  taxonomic duplication - MEGAN counts different strains of the same species (e.g. *Bradyrhizobium sp. AUGA SZCCT0282*, *Bradyrhizobium sp. SRL28*) as 2 taxa.
+
+Compared to Taxize, MEGAN tends to keep ambiguous entries and makes broader inferences with naming.
+Declaring a species count will depend on chosen parameters and assumptions.
+If one wants to be more conservative, stick with Taxize.
+
 # Analysis of nitrogenase gene clusters
 
 Nitrogenase is a bacterial enzyme that fixes atmospheric nitrogen (N2) to ammonia (NH3).
@@ -777,6 +787,17 @@ As a commonly used marker gene for N fixation, *nif*H tends to be more abundant 
 (It's also possible that *nif*H is retained in dormant or non-functional contexts.) For a fuller picture, screening for alternative nitrogenase genes such as vnfDHK and anfDHK may reveal additional diazotrophic potential.
 Also, current HMM profiles may fail to detect divergent *nif*D/K sequences, particularly if they differ substantially from their canonical forms.
 Interestingly, there were slightly more *nif* genes in rhizosphere samples than in bulk soil, and many of the top hits mapped to known diazotrophic taxa, supporting the ecological relevance of these findings.
+
+With all of that being said, the number of *nif*H hits are very low for an agricultural soil.
+This could occur for several reasons:
+
+1\.
+**HMM thresholds are too strict** - check e-value and scores, maybe lower them them more lenient,
+
+2\.
+**HMM database mismatch** - double check to see if others should be used.
+
+I could benchmark by downloading a few soil metagenomes from MG-RAST or NCBI SRA, running the same pipeline, and seeing if they yield higher *nif*H counts.
 
 # Next steps: scaling up
 
